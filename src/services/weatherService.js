@@ -295,7 +295,7 @@ async function fetchCemadenHourlyTelemetry(stationCode) {
   return null;
 }
 
-// Calculate accumulation windows (1h, 4h, 6h, 9h, 12h, 24h, 48h, 96h) from hourly observations
+// Calculate accumulation windows (1h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h) from hourly observations
 function calculateRainWindowsFromHourly(hourlyList, currentRainToday = 0) {
   const r = Math.round(currentRainToday * 10) / 10;
   if (!hourlyList || hourlyList.length === 0) {
@@ -306,6 +306,7 @@ function calculateRainWindowsFromHourly(hourlyList, currentRainToday = 0) {
       h9: Math.min(r, Math.round(r * 0.9 * 10) / 10),
       h12: Math.min(r, r),
       h24: r,
+      h36: r,
       h48: r,
       h96: r
     };
@@ -351,6 +352,7 @@ function calculateRainWindowsFromHourly(hourlyList, currentRainToday = 0) {
     h9: sumLastHours(9),
     h12: sumLastHours(12),
     h24: Math.max(sumLastHours(24), r),
+    h36: Math.max(sumLastHours(36), r),
     h48: Math.max(sumLastHours(48), r),
     h96: Math.max(sumLastHours(96), r)
   };
@@ -398,9 +400,10 @@ function calculateCemadenRainWindows(cemadenLive, cemadenHourly) {
   const h12 = sumHours(12) ?? a12;
   const h24 = sumHours(24) ?? a24;
   const h48 = Math.max(h24, a48);
+  const h36 = sumHours(36) ?? Math.round((h24 + (h48 - h24) * 0.5) * 10) / 10;
   const h96 = Math.max(h48, a96);
 
-  return { h1, h4, h6, h9, h12, h24, h48, h96 };
+  return { h1, h4, h6, h9, h12, h24, h36, h48, h96 };
 }
 
 // Calculate windows for INEA
@@ -418,10 +421,11 @@ function calculateIneaRainWindows(ineaLive) {
   const h12 = Math.round((r4 + diff4to24 * 0.75) * 10) / 10;
   const h24 = r24;
   const diff24to96 = Math.max(0, r96 - r24);
+  const h36 = Math.round((r24 + diff24to96 * 0.17) * 10) / 10;
   const h48 = Math.round((r24 + diff24to96 * 0.35) * 10) / 10;
   const h96 = r96;
 
-  return { h1, h4, h6, h9, h12, h24, h48, h96 };
+  return { h1, h4, h6, h9, h12, h24, h36, h48, h96 };
 }
 
 export async function fetchStationWeather(station) {
@@ -650,6 +654,7 @@ export async function fetchStationWeather(station) {
       rain3h: parseAcc(cemadenLive?.acc3hr),
       rain6h: parseAcc(cemadenLive?.acc6hr),
       rain12h: parseAcc(cemadenLive?.acc12hr),
+      rain36h: rainWindows.h36,
       rain48h: parseAcc(cemadenLive?.acc48hr),
       rain72h: parseAcc(cemadenLive?.acc72hr),
       rain96h: parseAcc(cemadenLive?.acc96hr),

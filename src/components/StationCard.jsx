@@ -213,7 +213,7 @@ export function StationCard({ station, weather, onSelect, onFocusMap, onOpenEmbe
               </div>
             </div>
 
-            {/* Multi-Window Accumulation Strip (1h, 4h, 6h, 9h, 12h, 24h, 48h, 96h) */}
+            {/* Multi-Window Accumulation Strip (1h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h) */}
             {current?.rainWindows && (
               <div className="mb-3 p-2 rounded-xl bg-slate-50/90 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
                 <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-1.5 px-0.5">
@@ -226,7 +226,7 @@ export function StationCard({ station, weather, onSelect, onFocusMap, onOpenEmbe
                     </span>
                   )}
                 </div>
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-1 text-center">
+                <div className="grid grid-cols-3 sm:grid-cols-9 gap-1 text-center">
                   {[
                     { label: '1h', val: current.rainWindows.h1 },
                     { label: '4h', val: current.rainWindows.h4 },
@@ -234,6 +234,7 @@ export function StationCard({ station, weather, onSelect, onFocusMap, onOpenEmbe
                     { label: '9h', val: current.rainWindows.h9 },
                     { label: '12h', val: current.rainWindows.h12 },
                     { label: '24h', val: current.rainWindows.h24 },
+                    { label: '36h', val: current.rainWindows.h36 },
                     { label: '48h', val: current.rainWindows.h48 },
                     { label: '96h', val: current.rainWindows.h96 }
                   ].map(w => {

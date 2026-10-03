@@ -21,13 +21,14 @@ const RAIN_WINDOWS = [
   { id: '9h', label: '9h (9 horas)', short: '9h' },
   { id: '12h', label: '12h (12 horas)', short: '12h' },
   { id: '24h', label: '24h (24 horas)', short: '24h' },
+  { id: '36h', label: '36h (36 horas)', short: '36h' },
   { id: '48h', label: '48h (48 horas)', short: '48h' },
   { id: '96h', label: '96h (96 horas)', short: '96h' }
 ];
 
 export function StationsComparisonChart({ stations, weatherData, lastUpdated, countdownFormatted }) {
   const [metricType, setMetricType] = useState('rain'); // 'rain' | 'rainRate' | 'wind' | 'temp'
-  const [rainWindow, setRainWindow] = useState('24h'); // '1h' | '4h' | '6h' | '9h' | '12h' | '24h' | '48h' | '96h'
+  const [rainWindow, setRainWindow] = useState('24h'); // '1h' | '4h' | '6h' | '9h' | '12h' | '24h' | '36h' | '48h' | '96h'
   const [showMatrix, setShowMatrix] = useState(true);
   const [sortOrder, setSortOrder] = useState('desc'); // 'desc' | 'asc' | 'alphabetical'
   const [copied, setCopied] = useState(false);
@@ -39,7 +40,7 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     const current = weather?.current;
     const isInactive = weather?.status === 'offline';
 
-    // Multi-temporal accumulation windows (1h, 4h, 6h, 9h, 12h, 24h, 48h, 96h)
+    // Multi-temporal accumulation windows (1h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h)
     const rawWindows = current?.rainWindows || {};
     const fallbackToday = current?.rainToday ?? current?.rainAccumulated24h ?? 0;
     const windows = {
@@ -49,6 +50,7 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
       h9: isInactive ? 0 : (rawWindows.h9 ?? Math.round(fallbackToday * 0.9 * 10) / 10),
       h12: isInactive ? 0 : (rawWindows.h12 ?? fallbackToday),
       h24: isInactive ? 0 : (rawWindows.h24 ?? fallbackToday),
+      h36: isInactive ? 0 : (rawWindows.h36 ?? fallbackToday),
       h48: isInactive ? 0 : (rawWindows.h48 ?? fallbackToday),
       h96: isInactive ? 0 : (rawWindows.h96 ?? fallbackToday)
     };
@@ -550,7 +552,7 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
               <Layers className="w-4 h-4 text-blue-600 dark:text-blue-400" />
               <div>
                 <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
-                  Matriz Comparativa de Acumulados (1h, 4h, 6h, 9h, 12h, 24h, 48h, 96h)
+                  Matriz Comparativa de Acumulados (1h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h)
                 </h4>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400">
                   Clique na coluna desejada para alternar o gráfico de barras acima
@@ -574,6 +576,7 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
                     { key: '9h', label: '9h' },
                     { key: '12h', label: '12h' },
                     { key: '24h', label: '24h (Hoje)' },
+                    { key: '36h', label: '36h' },
                     { key: '48h', label: '48h' },
                     { key: '96h', label: '96h' }
                   ].map(w => (
@@ -606,7 +609,7 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
                       </div>
                     </td>
                     
-                    {['1h', '4h', '6h', '9h', '12h', '24h', '48h', '96h'].map(wKey => {
+                    {['1h', '4h', '6h', '9h', '12h', '24h', '36h', '48h', '96h'].map(wKey => {
                       const prop = `h${wKey.replace('h', '')}`;
                       const val = item.isInactive ? 0 : (item.windows?.[prop] ?? 0);
                       const isSelected = rainWindow === wKey;

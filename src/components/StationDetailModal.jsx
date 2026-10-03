@@ -279,7 +279,7 @@ export function StationDetailModal({ station, weather, onClose }) {
                 </div>
               </div>
 
-              {/* Multi-Window Accumulation Grid (1h, 4h, 6h, 9h, 12h, 24h, 48h, 96h) */}
+              {/* Multi-Window Accumulation Grid (1h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h) */}
               {current?.rainWindows && (
                 <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40">
                   <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
@@ -293,7 +293,7 @@ export function StationDetailModal({ station, weather, onClose }) {
                     )}
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 text-center">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-9 gap-2 text-center">
                     {[
                       { label: '1 Hora', short: '1h', val: current.rainWindows.h1 },
                       { label: '4 Horas', short: '4h', val: current.rainWindows.h4 },
@@ -301,6 +301,7 @@ export function StationDetailModal({ station, weather, onClose }) {
                       { label: '9 Horas', short: '9h', val: current.rainWindows.h9 },
                       { label: '12 Horas', short: '12h', val: current.rainWindows.h12 },
                       { label: '24 Horas', short: '24h', val: current.rainWindows.h24 },
+                      { label: '36 Horas', short: '36h', val: current.rainWindows.h36 },
                       { label: '48 Horas', short: '48h', val: current.rainWindows.h48 },
                       { label: '96 Horas', short: '96h', val: current.rainWindows.h96 }
                     ].map(w => {
