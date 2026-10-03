@@ -1,0 +1,14 @@
+{
+  "framework": "vite",
+  "regions": ["gru1"],
+  "rewrites": [
+    { "source": "/api/inea/dados", "destination": "/api/inea/dados.js" },
+    { "source": "/api/pdf-boletim", "destination": "/api/pdf-boletim.js" },
+    { "source": "/api/cemaden/rj", "destination": "/api/cemaden/rj.js" },
+    { "source": "/api/cemaden/horario", "destination": "/api/cemaden/horario.js" },
+    { "source": "/api/wu/pws", "destination": "/api/wu/pws.js" },
+    { "source": "/api/wu/hourly", "destination": "/api/wu/hourly.js" },
+    { "source": "/api/wu/summary", "destination": "/api/wu/summary.js" },
+    { "source": "/api/wu/rapid", "destination": "/api/wu/rapid.js" }
+  ]
+}
