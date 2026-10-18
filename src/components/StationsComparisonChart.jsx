@@ -311,50 +311,42 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     }
   };
 
-  // Copy Text Report to Clipboard
+  // Copy Minimalist Text Report to Clipboard
   const [copiedText, setCopiedText] = useState(false);
   const handleCopyReportText = async () => {
     const curDate = new Date().toLocaleDateString('pt-BR');
     const curTime = lastUpdated || new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    let text = `======================================================\n`;
-    text += `🌧️ BOLETIM METEOROLÓGICO & PLUVIOMÉTRICO\n`;
-    text += `📍 Rio das Ostras - RJ e Bacia Hidrográfica\n`;
-    text += `📅 Data: ${curDate} | 🕒 Horário: ${curTime}\n`;
-    text += `======================================================\n\n`;
+    let text = `*CHUVAS EM RIO DAS OSTRAS*\n`;
+    text += `${curDate} • ${curTime}\n\n`;
 
-    chartItems.forEach((item, idx) => {
+    const activeList = [];
+    const inactiveList = [];
+
+    chartItems.forEach(item => {
       if (item.isInactive) {
-        text += `[${idx + 1}] 📍 ${item.name} (${item.codeLabel})\n`;
-        text += `    • Rede: ${item.station.network} | Bairro: ${item.station.neighborhood}\n`;
-        text += `    • Status: INATIVA / SEM TRANSMISSÃO RECENTE\n\n`;
+        inactiveList.push(item.name);
       } else {
         const w = item.windows || {};
-        text += `[${idx + 1}] 📍 ${item.name} (${item.codeLabel})\n`;
-        text += `    • Rede: ${item.station.network} | Bairro: ${item.station.neighborhood}\n`;
-        text += `    • Status: Ativa\n`;
+        let block = `• *${item.name}*`;
         if (item.station.isHydrological && item.station.riverLevel != null) {
-          text += `    • Nível do Rio: ${item.current?.riverLevel || item.station.riverLevel} m [${item.current?.statusMonitoramento || 'VIGILÂNCIA'}]\n`;
+          block += ` (Rio: ${item.current?.riverLevel || item.station.riverLevel}m)`;
         }
         if (item.rainStartTime && item.rainStartTime !== '--') {
-          text += `    • Início da Chuva: ${item.rainStartTime}\n`;
+          block += ` [Início: ${item.rainStartTime}]`;
         }
-        text += `    • Acumulados Pluviométricos:\n`;
-        text += `      - 01 hora:  ${(w.h1 ?? 0).toFixed(1)} mm\n`;
-        text += `      - 04 horas: ${(w.h4 ?? 0).toFixed(1)} mm\n`;
-        text += `      - 06 horas: ${(w.h6 ?? 0).toFixed(1)} mm\n`;
-        text += `      - 09 horas: ${(w.h9 ?? 0).toFixed(1)} mm\n`;
-        text += `      - 12 horas: ${(w.h12 ?? 0).toFixed(1)} mm\n`;
-        text += `      - 24 horas: ${(w.h24 ?? 0).toFixed(1)} mm\n`;
-        text += `      - 36 horas: ${(w.h36 ?? 0).toFixed(1)} mm\n`;
-        text += `      - 48 horas: ${(w.h48 ?? 0).toFixed(1)} mm\n`;
-        text += `      - 96 horas: ${(w.h96 ?? 0).toFixed(1)} mm\n\n`;
+        block += `\n  1h: ${(w.h1 ?? 0).toFixed(1)}mm | 4h: ${(w.h4 ?? 0).toFixed(1)}mm | 6h: ${(w.h6 ?? 0).toFixed(1)}mm | 9h: ${(w.h9 ?? 0).toFixed(1)}mm`;
+        block += `\n  12h: ${(w.h12 ?? 0).toFixed(1)}mm | 24h: ${(w.h24 ?? 0).toFixed(1)}mm | 36h: ${(w.h36 ?? 0).toFixed(1)}mm | 48h: ${(w.h48 ?? 0).toFixed(1)}mm | 96h: ${(w.h96 ?? 0).toFixed(1)}mm`;
+        activeList.push(block);
       }
     });
 
-    text += `======================================================\n`;
-    text += `📊 Fontes: Weather Underground PWS • INEA Alerta de Cheias • CEMADEN\n`;
-    text += `🌐 Painel Online 24h: https://clima-rio-das-ostras.vercel.app\n`;
-    text += `======================================================`;
+    text += activeList.join('\n\n');
+
+    if (inactiveList.length > 0) {
+      text += `\n\n_Inativas / sem sinal: ${inactiveList.join(', ')}_`;
+    }
+
+    text += `\n\nPainel 24h: https://clima-rio-das-ostras.vercel.app`;
 
     try {
       await navigator.clipboard.writeText(text);
@@ -389,11 +381,11 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={handleCopyReportText}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-bold border border-blue-200/80 dark:border-blue-800 transition active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition active:scale-95 cursor-pointer"
             title="Copiar material escrito com todos os intervalos e estações para WhatsApp"
           >
-            {copiedText ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <FileText className="w-3.5 h-3.5" />}
-            <span>{copiedText ? 'Texto Copiado!' : 'Copiar Relatório Escrito'}</span>
+            {copiedText ? <Check className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" /> : <FileText className="w-3.5 h-3.5" />}
+            <span>{copiedText ? 'Texto Copiado!' : 'Copiar Texto (WhatsApp)'}</span>
           </button>
 
           <button
