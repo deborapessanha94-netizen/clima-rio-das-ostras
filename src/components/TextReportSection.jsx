@@ -8,6 +8,7 @@ import {
   Clock, 
   Layers
 } from 'lucide-react';
+import { getStationDisplayNameWithCode } from '../data/stations';
 
 export function TextReportSection({ stations, weatherData, lastUpdated }) {
   const [reportFormat, setReportFormat] = useState('whatsapp'); // Default to minimalist WhatsApp as requested!
@@ -62,10 +63,11 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
 
     displayedStations.forEach(st => {
       const data = getStationWindows(st);
+      const stationNameWithCode = getStationDisplayNameWithCode(st);
       if (data.isInactive) {
-        inactiveList.push(st.shortName || st.name);
+        inactiveList.push(stationNameWithCode);
       } else {
-        let block = `${st.shortName || st.name}`;
+        let block = stationNameWithCode;
         if (st.isHydrological && data.riverLevel != null) {
           block += ` (Rio: ${data.riverLevel}m)`;
         }
@@ -136,7 +138,7 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
 
     displayedStations.forEach(st => {
       const data = getStationWindows(st);
-      const name = (st.shortName || st.name).padEnd(27).slice(0, 27);
+      const name = getStationDisplayNameWithCode(st).padEnd(28).slice(0, 28);
       if (data.isInactive) {
         text += `${name} | Inativa (sem transmissão recente)\n`;
       } else {
@@ -178,9 +180,10 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
 
   const handleCopyStation = async (st) => {
     const data = getStationWindows(st);
+    const stationNameWithCode = getStationDisplayNameWithCode(st);
     if (data.isInactive) {
       try {
-        await navigator.clipboard.writeText(`${st.shortName || st.name}: Inativa (sem sinal)`);
+        await navigator.clipboard.writeText(`${stationNameWithCode}: Inativa (sem sinal)`);
         setCopiedStationId(st.id);
         setTimeout(() => setCopiedStationId(null), 2000);
       } catch (err) {
@@ -189,7 +192,7 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
       return;
     }
 
-    let text = `${st.shortName || st.name}`;
+    let text = stationNameWithCode;
     if (st.isHydrological && data.riverLevel != null) text += ` (Rio: ${data.riverLevel}m)`;
     if (data.startTime) text += ` [Início: ${data.startTime}]`;
 
@@ -371,7 +374,7 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <div>
                       <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-slate-100 block">
-                        {st.name}
+                        {getStationDisplayNameWithCode(st)}
                       </span>
                       <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
                         {st.neighborhood} &bull; {st.network}

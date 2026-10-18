@@ -232,3 +232,26 @@ export const NEIGHBORHOODS = [
   "Palmital / Casimiro (PCD 02)",
   "Palmital / Casimiro (PCD 03)"
 ];
+
+export function getStationDisplayNameWithCode(st) {
+  if (!st) return '';
+  const code = st.code || st.id;
+  
+  if (st.id === 'IRIODA17') return `Defesa Civil (${code})`;
+  if (st.id === 'IRIODA15') return `Rocha Leão (${code})`;
+  if (st.id === 'IRIODA16') return `Cantagalo (${code})`;
+  if (st.id === 'IRIODA6') return `Escola Jacinto (${code})`;
+  if (st.id === 'ICASIM5') return `Barra de São João (${code})`;
+  if (st.id === 'IRIODA5') return `Parque dos Pássaros (${code})`;
+  if (st.id === 'inea-jundia') return `INEA Rio Jundiá (${code})`;
+  if (st.id === 'cemaden-18788') return `Palmital 01 (CEMADEN ${code})`;
+  if (st.id === 'cemaden-18790') return `Palmital 02 (CEMADEN ${code})`;
+  if (st.id === 'cemaden-18789') return `Palmital 03 (CEMADEN ${code})`;
+
+  // Fallback for custom or newly added stations
+  const base = st.shortName || st.neighborhood?.split('/')[0]?.trim() || st.name;
+  if (code && !base.includes(code)) {
+    return `${base} (${code})`;
+  }
+  return base;
+}

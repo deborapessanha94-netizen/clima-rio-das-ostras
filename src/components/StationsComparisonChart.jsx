@@ -14,6 +14,7 @@ import {
   FileText,
   Table as TableIcon
 } from 'lucide-react';
+import { getStationDisplayNameWithCode } from '../data/stations';
 
 const RAIN_WINDOWS = [
   { id: '1h', label: '1h (1 hora)', short: '1h' },
@@ -325,11 +326,12 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     const inactiveList = [];
 
     chartItems.forEach(item => {
+      const stationNameWithCode = getStationDisplayNameWithCode(item.station || item);
       if (item.isInactive) {
-        inactiveList.push(item.name);
+        inactiveList.push(stationNameWithCode);
       } else {
         const w = item.windows || {};
-        let block = `${item.name}`;
+        let block = stationNameWithCode;
         if (item.station?.isHydrological && (item.current?.riverLevel != null || item.station?.riverLevel != null)) {
           block += ` (Rio: ${item.current?.riverLevel ?? item.station?.riverLevel}m)`;
         }
