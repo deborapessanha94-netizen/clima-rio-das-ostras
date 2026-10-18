@@ -11,6 +11,7 @@ import { DailyBulletinsModal } from './components/DailyBulletinsModal';
 import { EmbeddedStationModal } from './components/EmbeddedStationModal';
 import { StationLinksModal } from './components/StationLinksModal';
 import { StationsComparisonChart } from './components/StationsComparisonChart';
+import { TextReportSection } from './components/TextReportSection';
 import { Footer } from './components/Footer';
 import { 
   LayoutGrid, 
@@ -20,7 +21,8 @@ import {
   Search,
   Map as MapIcon,
   RotateCcw,
-  BarChart3
+  BarChart3,
+  FileText
 } from 'lucide-react';
 
 export function App() {
@@ -312,8 +314,8 @@ export function App() {
                 </button>
               )}
 
-              {/* View Switcher: Cards vs Gráfico vs Table */}
-              <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
+              {/* View Switcher: Cards vs Gráfico vs Table vs Material Escrito */}
+              <div className="flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 flex-wrap gap-1">
                 <button
                   onClick={() => setActiveTab('cards')}
                   className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
@@ -351,6 +353,19 @@ export function App() {
                 >
                   <Table className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Tabela</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('report')}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition ${
+                    activeTab === 'report'
+                      ? 'bg-white dark:bg-slate-700 text-blue-700 dark:text-blue-300 shadow-xs'
+                      : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
+                  }`}
+                  title="Material Escrito / Relatório Textual com todos os intervalos para copiar"
+                >
+                  <FileText className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                  <span className="font-bold">Material Escrito</span>
                 </button>
               </div>
             </div>
@@ -397,7 +412,7 @@ export function App() {
                 />
               ))}
             </div>
-          ) : (
+          ) : activeTab === 'table' ? (
             <ComparisonTable 
               stations={filteredStations}
               weatherData={weatherData}
@@ -408,6 +423,13 @@ export function App() {
                 setShowMap(true);
                 window.scrollTo({ top: 180, behavior: 'smooth' });
               }}
+            />
+          ) : (
+            <TextReportSection 
+              stations={filteredStations.length > 0 ? filteredStations : stations}
+              weatherData={weatherData}
+              lastUpdated={lastUpdated}
+              countdownFormatted={formatCountdown(countdown)}
             />
           )}
         </section>
