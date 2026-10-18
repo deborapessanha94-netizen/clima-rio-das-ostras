@@ -147,13 +147,15 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
   const scaleMarks = Array.from({ length: stepCount + 1 }, (_, i) => i * step);
 
   // Generate PNG image of the chart using HTML5 Canvas (Infographic Poster for Rain)
-  const generateCanvasImage = () => {
+  const generateCanvasImage = (fmt = 'post') => {
     if (metricType === 'rain') {
+      const activeOnly = sortedItems.filter(i => !i.isInactive);
       return generateInfographicCanvas({
-        items: sortedItems,
+        items: activeOnly,
         rainWindow,
-        watermark: 'Engmetclima',
-        lastUpdated
+        watermark: 'tempo@tempoemriodasostras',
+        lastUpdated,
+        format: fmt
       });
     }
 

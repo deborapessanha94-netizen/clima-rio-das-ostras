@@ -1,6 +1,7 @@
 /**
- * Utility to generate high-resolution Infographic Poster Images for daily rainfall accumulations.
- * Matches the official Engmetclima / Clima Rio das Ostras dark blue visual style.
+ * Utility to generate ultra high-resolution Infographic Poster Images for daily rainfall accumulations.
+ * Supports Instagram Story / WhatsApp Status (9:16) and Instagram Feed Post (4:5).
+ * Matches the official tempo@tempoemriodasostras / Clima Rio das Ostras dark blue visual style.
  */
 
 export function formatStationDetailsForInfographic(station) {
@@ -45,19 +46,23 @@ export function formatStationDetailsForInfographic(station) {
 export function generateInfographicCanvas({
   items,
   rainWindow = '24h',
-  watermark = 'Engmetclima',
+  watermark = 'tempo@tempoemriodasostras',
   customTitle = 'ACUMULADOS DE',
   customSubtitle = 'Estações com maiores registros',
-  lastUpdated = ''
+  lastUpdated = '',
+  format = 'post' // 'story' (9:16) | 'post' (4:5)
 }) {
   const canvas = document.createElement('canvas');
-  const width = 900;
-  const topPadding = 185;
-  const rowHeight = 96;
-  const bottomPadding = 80;
-  const height = topPadding + (items.length * rowHeight) + bottomPadding;
+  const isStory = format === 'story';
 
-  const dpr = 2; // High-resolution Retina export (1800 x height*2)
+  // Base dimensions:
+  // Story: 1080 x 1920 (9:16)
+  // Post: 1080 x 1350 (4:5 portrait)
+  const width = 1080;
+  const height = isStory ? 1920 : 1350;
+
+  // Ultra-crisp Retina 2x scale (Story exports at 2160x3840, Post at 2160x2700)
+  const dpr = 2;
   canvas.width = width * dpr;
   canvas.height = height * dpr;
   const ctx = canvas.getContext('2d');
@@ -66,152 +71,176 @@ export function generateInfographicCanvas({
   // 1. Deep Midnight Navy Gradient Background
   const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
   bgGrad.addColorStop(0, '#03122c');
-  bgGrad.addColorStop(0.5, '#020d20');
+  bgGrad.addColorStop(0.4, '#020d20');
   bgGrad.addColorStop(1, '#010814');
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, width, height);
 
   // 2. Subtle Topographic Contour Wave Lines in Background
   ctx.strokeStyle = 'rgba(56, 189, 248, 0.04)';
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 2;
 
   ctx.beginPath();
-  ctx.moveTo(0, height * 0.15);
-  ctx.bezierCurveTo(width * 0.3, height * 0.05, width * 0.7, height * 0.25, width, height * 0.12);
+  ctx.moveTo(0, height * 0.12);
+  ctx.bezierCurveTo(width * 0.3, height * 0.04, width * 0.7, height * 0.22, width, height * 0.1);
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(0, height * 0.45);
-  ctx.bezierCurveTo(width * 0.25, height * 0.55, width * 0.75, height * 0.35, width, height * 0.5);
+  ctx.moveTo(0, height * 0.4);
+  ctx.bezierCurveTo(width * 0.25, height * 0.5, width * 0.75, height * 0.3, width, height * 0.45);
   ctx.stroke();
 
   ctx.beginPath();
-  ctx.moveTo(0, height * 0.78);
-  ctx.bezierCurveTo(width * 0.4, height * 0.7, width * 0.6, height * 0.88, width, height * 0.75);
+  ctx.moveTo(0, height * 0.75);
+  ctx.bezierCurveTo(width * 0.4, height * 0.65, width * 0.6, height * 0.85, width, height * 0.72);
   ctx.stroke();
 
-  // 3. Top Header
+  // 3. Header Section
+  const leftMargin = 70;
+  const rightMargin = width - 70;
+  const topPadding = isStory ? 140 : 80;
+
   // Vertical Cyan Bar
+  const barHeight = isStory ? 95 : 85;
   ctx.fillStyle = '#00e5ff';
   ctx.beginPath();
-  ctx.roundRect(50, 42, 6, 76, [3, 3, 3, 3]);
+  ctx.roundRect(leftMargin, topPadding, 8, barHeight, [4, 4, 4, 4]);
   ctx.fill();
 
   // Title Line 1: ACUMULADOS DE
   ctx.textAlign = 'left';
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(customTitle, 72, 70);
+  ctx.font = isStory 
+    ? 'bold 38px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    : 'bold 34px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText(customTitle, leftMargin + 26, isStory ? topPadding + 38 : topPadding + 36);
 
   // Title Line 2: CHUVA
   ctx.fillStyle = '#38bdf8';
-  ctx.font = '900 48px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText('CHUVA', 72, 116);
+  ctx.font = isStory 
+    ? '900 64px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    : '900 56px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText('CHUVA', leftMargin + 26, isStory ? topPadding + 98 : topPadding + 90);
 
   // Subtitle: Estações com maiores registros
+  const subtitleY = isStory ? topPadding + 155 : topPadding + 138;
   ctx.fillStyle = '#cbd5e1';
-  ctx.font = '400 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(customSubtitle, 50, 160);
+  ctx.font = isStory 
+    ? '400 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    : '400 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText(customSubtitle, leftMargin, subtitleY);
 
-  // Date & Window Tag on Right of Header
+  // Date, Time & Window Tag on Right of Header
   const dateStr = new Date().toLocaleDateString('pt-BR');
   const timeStr = lastUpdated || new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
   const windowLabel = rainWindow === 'today' ? 'Hoje' : rainWindow.toUpperCase();
   ctx.textAlign = 'right';
   ctx.fillStyle = '#64748b';
-  ctx.font = '500 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(`${dateStr} • ${timeStr} • Acumulado ${windowLabel}`, width - 50, 160);
+  ctx.font = isStory 
+    ? '500 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    : '500 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText(`${dateStr} • ${timeStr} • Acumulado ${windowLabel}`, rightMargin, subtitleY);
 
   // Horizontal Thin Divider
-  ctx.strokeStyle = 'rgba(56, 189, 248, 0.22)';
-  ctx.lineWidth = 1;
+  const dividerY = isStory ? topPadding + 180 : topPadding + 158;
+  ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+  ctx.lineWidth = 1.2;
   ctx.beginPath();
-  ctx.moveTo(50, 178);
-  ctx.lineTo(width - 50, 178);
+  ctx.moveTo(leftMargin, dividerY);
+  ctx.lineTo(rightMargin, dividerY);
   ctx.stroke();
 
-  // 4. Station Rows
+  // 4. Station Rows (Active Stations Only)
+  // Calculate dynamic vertical row distribution
+  const rowsStartY = dividerY + (isStory ? 45 : 35);
+  const footerY = isStory ? height - 120 : height - 75;
+  const availableHeight = footerY - rowsStartY - 30;
+  
+  const rowCount = Math.max(items.length, 1);
+  const rowSpacing = Math.min(
+    Math.floor(availableHeight / rowCount), 
+    isStory ? 155 : 130
+  );
+
   const maxVal = Math.max(...items.map(i => i.value), 5);
-  const barStartX = 320;
-  const maxBarWidth = 250;
+  const barStartX = 400;
+  const maxBarWidth = 300;
 
   items.forEach((item, idx) => {
-    const y = topPadding + (idx * rowHeight);
+    const rowY = rowsStartY + (idx * rowSpacing);
     const { name, code, network } = formatStationDetailsForInfographic(item.station || item);
 
     // Left Column: Station Name
     ctx.textAlign = 'left';
-    ctx.fillStyle = item.isInactive ? '#94a3b8' : '#ffffff';
-    ctx.font = 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    ctx.fillText(name, 50, y + 20);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = isStory 
+      ? 'bold 22px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      : 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText(name, leftMargin, isStory ? rowY + 28 : rowY + 24);
 
     // Left Column: Code Badge (Pill with cyan border)
-    ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.font = isStory 
+      ? 'bold 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      : 'bold 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     const codeTextWidth = ctx.measureText(code).width;
-    const badgeW = Math.max(codeTextWidth + 16, 68);
-    const badgeH = 20;
-    const badgeX = 50;
-    const badgeY = y + 29;
+    const badgeW = Math.max(codeTextWidth + 18, 76);
+    const badgeH = isStory ? 24 : 22;
+    const badgeY = isStory ? rowY + 42 : rowY + 36;
 
-    ctx.strokeStyle = item.isInactive ? '#475569' : '#0284c7';
+    ctx.strokeStyle = '#0284c7';
     ctx.lineWidth = 1.2;
-    ctx.fillStyle = item.isInactive ? 'rgba(71, 85, 105, 0.15)' : 'rgba(2, 132, 199, 0.12)';
+    ctx.fillStyle = 'rgba(2, 132, 199, 0.15)';
     ctx.beginPath();
-    ctx.roundRect(badgeX, badgeY, badgeW, badgeH, [5, 5, 5, 5]);
+    ctx.roundRect(leftMargin, badgeY, badgeW, badgeH, [5, 5, 5, 5]);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = item.isInactive ? '#94a3b8' : '#38bdf8';
-    ctx.fillText(code, badgeX + 8, badgeY + 14);
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillText(code, leftMargin + 9, badgeY + (isStory ? 16 : 15));
 
     // Left Column: Network Subtitle
     ctx.fillStyle = '#64748b';
-    ctx.font = '500 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-    ctx.fillText(network, 50, y + 66);
+    ctx.font = isStory 
+      ? '500 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      : '500 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText(network, leftMargin, isStory ? rowY + 92 : rowY + 80);
 
-    // Center Column: Rounded Blue Bar & Value
-    if (!item.isInactive) {
-      const barRatio = Math.min(Math.max(item.value / maxVal, 0), 1);
-      const barW = Math.max(barRatio * maxBarWidth, item.value > 0 ? 32 : 0);
-      const barH = 26;
-      const barY = y + 26;
+    // Center Column: Rounded Blue Progress Bar & Value
+    const barRatio = Math.min(Math.max(item.value / maxVal, 0), 1);
+    const barW = Math.max(barRatio * maxBarWidth, item.value > 0 ? 36 : 0);
+    const barH = isStory ? 34 : 30;
+    const barY = isStory ? rowY + 36 : rowY + 30;
+    const pillRadius = barH / 2;
 
-      if (barW > 0) {
-        // Electric Blue Pill Bar
-        const barGrad = ctx.createLinearGradient(barStartX, 0, barStartX + barW, 0);
-        barGrad.addColorStop(0, '#1d4ed8');
-        barGrad.addColorStop(0.5, '#1e88e5');
-        barGrad.addColorStop(1, '#00b0ff');
-        ctx.fillStyle = barGrad;
-        ctx.beginPath();
-        ctx.roundRect(barStartX, barY, barW, barH, [13, 13, 13, 13]);
-        ctx.fill();
-      }
-
-      // Rain Value Text (placed right after bar)
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      const labelX = barStartX + barW + 14;
-      ctx.fillText(`${item.value.toFixed(1)} mm`, labelX, y + 46);
-    } else {
-      // Inactive Sensor text
-      ctx.textAlign = 'left';
-      ctx.fillStyle = '#64748b';
-      ctx.font = 'italic 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-      ctx.fillText('Sensor Inativo', barStartX + 10, y + 45);
+    if (barW > 0) {
+      // Vibrant Electric Blue Pill Bar
+      const barGrad = ctx.createLinearGradient(barStartX, 0, barStartX + barW, 0);
+      barGrad.addColorStop(0, '#1d4ed8');
+      barGrad.addColorStop(0.5, '#1e88e5');
+      barGrad.addColorStop(1, '#00b0ff');
+      ctx.fillStyle = barGrad;
+      ctx.beginPath();
+      ctx.roundRect(barStartX, barY, barW, barH, [pillRadius, pillRadius, pillRadius, pillRadius]);
+      ctx.fill();
     }
 
+    // Rain Value Text (placed right after bar)
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffffff';
+    ctx.font = isStory 
+      ? 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      : 'bold 21px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    const labelX = barStartX + barW + (isStory ? 16 : 14);
+    ctx.fillText(`${item.value.toFixed(1)} mm`, labelX, isStory ? rowY + 60 : rowY + 52);
+
     // Right Column: Rain Start Pill Badge
-    const rightPillW = 168;
-    const rightPillH = 28;
-    const rightPillX = width - 50 - rightPillW;
-    const rightPillY = y + 25;
+    const rightPillW = isStory ? 200 : 185;
+    const rightPillH = isStory ? 34 : 30;
+    const rightPillX = rightMargin - rightPillW;
+    const rightPillY = isStory ? rowY + 36 : rowY + 30;
 
     let rainStartText = '';
-    if (item.isInactive) {
-      rainStartText = 'sem sinal';
-    } else if (item.rainStartTime && item.rainStartTime !== '--') {
+    if (item.rainStartTime && item.rainStartTime !== '--') {
       rainStartText = `início às ${item.rainStartTime}`;
     } else if (item.value > 0) {
       rainStartText = 'com chuva';
@@ -219,42 +248,46 @@ export function generateInfographicCanvas({
       rainStartText = 'sem chuva hoje';
     }
 
-    ctx.strokeStyle = item.isInactive ? '#334155' : '#0369a1';
+    ctx.strokeStyle = '#0369a1';
     ctx.lineWidth = 1.2;
-    ctx.fillStyle = item.isInactive ? 'rgba(51, 65, 85, 0.15)' : 'rgba(3, 105, 161, 0.12)';
+    ctx.fillStyle = 'rgba(3, 105, 161, 0.14)';
     ctx.beginPath();
     ctx.roundRect(rightPillX, rightPillY, rightPillW, rightPillH, [7, 7, 7, 7]);
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = item.isInactive ? '#64748b' : '#38bdf8';
-    ctx.font = '500 12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = isStory 
+      ? '500 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+      : '500 13.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(rainStartText, rightPillX + (rightPillW / 2), rightPillY + 18);
+    ctx.fillText(rainStartText, rightPillX + (rightPillW / 2), isStory ? rightPillY + 22 : rightPillY + 20);
   });
 
   // 5. Bottom Footer
-  const footerY = topPadding + (items.length * rowHeight) + 24;
-
   // Cyan Accent Dash
   ctx.strokeStyle = '#00e5ff';
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 3;
   ctx.beginPath();
-  ctx.moveTo(50, footerY + 12);
-  ctx.lineTo(85, footerY + 12);
+  ctx.moveTo(leftMargin, footerY);
+  ctx.lineTo(leftMargin + 40, footerY);
   ctx.stroke();
 
-  // Watermark text
+  // Signature / Watermark text: tempo@tempoemriodasostras
   ctx.textAlign = 'left';
   ctx.fillStyle = '#94a3b8';
-  ctx.font = '500 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(watermark, 96, footerY + 16);
+  ctx.font = isStory 
+    ? 'bold 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    : 'bold 16px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText(watermark, leftMargin + 52, isStory ? footerY + 6 : footerY + 5);
 
-  // Right side footer text
+  // Right footer: Fontes das estações de cada bairro
   ctx.textAlign = 'right';
   ctx.fillStyle = '#64748b';
-  ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText('Fontes: WU • INEA • CEMADEN | Rio das Ostras - RJ', width - 50, footerY + 16);
+  ctx.font = isStory 
+    ? '500 15px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    : '500 13.5px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText('Fontes: Estações de cada bairro • Rio das Ostras - RJ', rightMargin, isStory ? footerY + 6 : footerY + 5);
 
   return canvas;
 }
