@@ -120,7 +120,9 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
       isInactive,
       rainStartTime,
       rainStartLabel,
-      windows
+      windows,
+      station,
+      current
     };
   });
 
@@ -311,13 +313,13 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     }
   };
 
-  // Copy Minimalist Text Report to Clipboard
+  // Copy Minimalist Text Report to Clipboard (12h, 24h, 36h without asterisks)
   const [copiedText, setCopiedText] = useState(false);
   const handleCopyReportText = async () => {
     const curDate = new Date().toLocaleDateString('pt-BR');
     const curTime = lastUpdated || new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    let text = `*CHUVAS EM RIO DAS OSTRAS*\n`;
-    text += `${curDate} • ${curTime}\n\n`;
+    let text = `CHUVAS EM RIO DAS OSTRAS\n`;
+    text += `${curDate} - ${curTime}\n\n`;
 
     const activeList = [];
     const inactiveList = [];
@@ -327,15 +329,14 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
         inactiveList.push(item.name);
       } else {
         const w = item.windows || {};
-        let block = `• *${item.name}*`;
-        if (item.station.isHydrological && item.station.riverLevel != null) {
-          block += ` (Rio: ${item.current?.riverLevel || item.station.riverLevel}m)`;
+        let block = `${item.name}`;
+        if (item.station?.isHydrological && (item.current?.riverLevel != null || item.station?.riverLevel != null)) {
+          block += ` (Rio: ${item.current?.riverLevel ?? item.station?.riverLevel}m)`;
         }
         if (item.rainStartTime && item.rainStartTime !== '--') {
           block += ` [Início: ${item.rainStartTime}]`;
         }
-        block += `\n  1h: ${(w.h1 ?? 0).toFixed(1)}mm | 4h: ${(w.h4 ?? 0).toFixed(1)}mm | 6h: ${(w.h6 ?? 0).toFixed(1)}mm | 9h: ${(w.h9 ?? 0).toFixed(1)}mm`;
-        block += `\n  12h: ${(w.h12 ?? 0).toFixed(1)}mm | 24h: ${(w.h24 ?? 0).toFixed(1)}mm | 36h: ${(w.h36 ?? 0).toFixed(1)}mm | 48h: ${(w.h48 ?? 0).toFixed(1)}mm | 96h: ${(w.h96 ?? 0).toFixed(1)}mm`;
+        block += `\n12h: ${(w.h12 ?? 0).toFixed(1)}mm | 24h: ${(w.h24 ?? 0).toFixed(1)}mm | 36h: ${(w.h36 ?? 0).toFixed(1)}mm`;
         activeList.push(block);
       }
     });
@@ -343,10 +344,10 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     text += activeList.join('\n\n');
 
     if (inactiveList.length > 0) {
-      text += `\n\n_Inativas / sem sinal: ${inactiveList.join(', ')}_`;
+      text += `\n\nInativas: ${inactiveList.join(', ')}`;
     }
 
-    text += `\n\nPainel 24h: https://clima-rio-das-ostras.vercel.app`;
+    text += `\n\nPainel: https://clima-rio-das-ostras.vercel.app`;
 
     try {
       await navigator.clipboard.writeText(text);
@@ -382,7 +383,7 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
           <button
             onClick={handleCopyReportText}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition active:scale-95 cursor-pointer"
-            title="Copiar material escrito com todos os intervalos e estações para WhatsApp"
+            title="Copiar texto resumido (12h, 24h, 36h) para WhatsApp"
           >
             {copiedText ? <Check className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" /> : <FileText className="w-3.5 h-3.5" />}
             <span>{copiedText ? 'Texto Copiado!' : 'Copiar Texto (WhatsApp)'}</span>

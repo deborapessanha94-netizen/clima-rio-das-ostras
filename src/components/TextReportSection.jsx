@@ -52,10 +52,10 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
     return weatherData[st.id]?.status !== 'offline';
   });
 
-  // 1. MINIMALIST WHATSAPP FORMAT (Clean, zero clutter, concise)
+  // 1. MINIMALIST WHATSAPP FORMAT (Clean, zero clutter, concise, no asterisks, only 12h, 24h, 36h)
   const generateWhatsAppReport = () => {
-    let text = `*CHUVAS EM RIO DAS OSTRAS*\n`;
-    text += `${currentDate} • ${currentTime}\n\n`;
+    let text = `CHUVAS EM RIO DAS OSTRAS\n`;
+    text += `${currentDate} - ${currentTime}\n\n`;
 
     const activeList = [];
     const inactiveList = [];
@@ -65,15 +65,14 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
       if (data.isInactive) {
         inactiveList.push(st.shortName || st.name);
       } else {
-        let block = `• *${st.shortName || st.name}*`;
+        let block = `${st.shortName || st.name}`;
         if (st.isHydrological && data.riverLevel != null) {
           block += ` (Rio: ${data.riverLevel}m)`;
         }
         if (data.startTime) {
           block += ` [Início: ${data.startTime}]`;
         }
-        block += `\n  1h: ${data.h1.toFixed(1)}mm | 4h: ${data.h4.toFixed(1)}mm | 6h: ${data.h6.toFixed(1)}mm | 9h: ${data.h9.toFixed(1)}mm`;
-        block += `\n  12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm | 48h: ${data.h48.toFixed(1)}mm | 96h: ${data.h96.toFixed(1)}mm`;
+        block += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;
         activeList.push(block);
       }
     });
@@ -81,10 +80,10 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
     text += activeList.join('\n\n');
 
     if (inactiveList.length > 0 && !filterActiveOnly) {
-      text += `\n\n_Inativas / sem sinal: ${inactiveList.join(', ')}_`;
+      text += `\n\nInativas: ${inactiveList.join(', ')}`;
     }
 
-    text += `\n\nPainel 24h: https://clima-rio-das-ostras.vercel.app`;
+    text += `\n\nPainel: https://clima-rio-das-ostras.vercel.app`;
     return text;
   };
 
@@ -179,11 +178,27 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
 
   const handleCopyStation = async (st) => {
     const data = getStationWindows(st);
-    let text = `• *${st.shortName || st.name}*\n`;
-    if (st.isHydrological && data.riverLevel != null) text += `  Nível do Rio: ${data.riverLevel}m\n`;
-    if (data.startTime) text += `  Início da chuva: ${data.startTime}\n`;
-    text += `  1h: ${data.h1.toFixed(1)}mm | 4h: ${data.h4.toFixed(1)}mm | 6h: ${data.h6.toFixed(1)}mm | 9h: ${data.h9.toFixed(1)}mm\n`;
-    text += `  12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm | 48h: ${data.h48.toFixed(1)}mm | 96h: ${data.h96.toFixed(1)}mm`;
+    if (data.isInactive) {
+      try {
+        await navigator.clipboard.writeText(`${st.shortName || st.name}: Inativa (sem sinal)`);
+        setCopiedStationId(st.id);
+        setTimeout(() => setCopiedStationId(null), 2000);
+      } catch (err) {
+        console.error(err);
+      }
+      return;
+    }
+
+    let text = `${st.shortName || st.name}`;
+    if (st.isHydrological && data.riverLevel != null) text += ` (Rio: ${data.riverLevel}m)`;
+    if (data.startTime) text += ` [Início: ${data.startTime}]`;
+
+    if (reportFormat === 'whatsapp') {
+      text += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;
+    } else {
+      text += `\n1h: ${data.h1.toFixed(1)}mm | 4h: ${data.h4.toFixed(1)}mm | 6h: ${data.h6.toFixed(1)}mm | 9h: ${data.h9.toFixed(1)}mm`;
+      text += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm | 48h: ${data.h48.toFixed(1)}mm | 96h: ${data.h96.toFixed(1)}mm`;
+    }
 
     try {
       await navigator.clipboard.writeText(text);
@@ -229,7 +244,7 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Texto consolidado com todos os 9 intervalos de tempo (1h a 96h) formatado para WhatsApp e boletins
+                Texto pronto para cópia rápida com opções compacta (12h, 24h, 36h) e completa (1h a 96h)
               </p>
             </div>
           </div>
@@ -272,9 +287,9 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
               Formato:
             </span>
             {[
-              { id: 'whatsapp', label: 'Compacto WhatsApp (Minimalista)' },
-              { id: 'detailed', label: 'Boletim Detalhado' },
-              { id: 'table', label: 'Tabela em Texto' }
+              { id: 'whatsapp', label: 'Compacto WhatsApp (12h, 24h, 36h)' },
+              { id: 'detailed', label: 'Boletim Detalhado (1h a 96h)' },
+              { id: 'table', label: 'Tabela em Texto (1h a 96h)' }
             ].map(fmt => (
               <button
                 key={fmt.id}
