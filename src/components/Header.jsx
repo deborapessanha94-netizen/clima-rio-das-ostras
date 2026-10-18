@@ -9,7 +9,8 @@ import {
   ExternalLink,
   PlusCircle,
   Link2,
-  BarChart3
+  BarChart3,
+  Sparkles
 } from 'lucide-react';
 
 export function Header({ 
@@ -25,7 +26,8 @@ export function Header({
   onOpenAddModal,
   onOpenBulletinsModal,
   onOpenLinksModal,
-  onOpenChartTab
+  onOpenChartTab,
+  onOpenInfographicModal
 }) {
   const activeStations = stations.filter(s => weatherData[s.id]?.status !== 'offline');
   const validWeathers = activeStations.map(s => weatherData[s.id]?.current).filter(Boolean);
@@ -78,6 +80,19 @@ export function Header({
 
         {/* Unified Action Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
+          {/* Card Oficial Diário (Infográfico) */}
+          {onOpenInfographicModal && (
+            <button
+              onClick={onOpenInfographicModal}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 transition shadow-xs cursor-pointer"
+              title="Gerar e baixar o Card Oficial de Acumulados de Chuva Diário (Infográfico)"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
+              <span className="hidden xs:inline">Card Oficial Diário</span>
+              <span className="xs:hidden">Card Diário</span>
+            </button>
+          )}
+
           {/* Gráfico Geral */}
           {onOpenChartTab && (
             <button

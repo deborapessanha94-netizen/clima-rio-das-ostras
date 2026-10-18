@@ -12,6 +12,7 @@ import { EmbeddedStationModal } from './components/EmbeddedStationModal';
 import { StationLinksModal } from './components/StationLinksModal';
 import { StationsComparisonChart } from './components/StationsComparisonChart';
 import { TextReportSection } from './components/TextReportSection';
+import { DailyInfographicModal } from './components/DailyInfographicModal';
 import { Footer } from './components/Footer';
 import { 
   LayoutGrid, 
@@ -22,7 +23,9 @@ import {
   Map as MapIcon,
   RotateCcw,
   BarChart3,
-  FileText
+  FileText,
+  Sparkles,
+  Download
 } from 'lucide-react';
 
 export function App() {
@@ -55,6 +58,7 @@ export function App() {
   const [isBulletinsModalOpen, setIsBulletinsModalOpen] = useState(false);
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
   const [embeddedStation, setEmbeddedStation] = useState(null);
+  const [isInfographicModalOpen, setIsInfographicModalOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
@@ -183,6 +187,7 @@ export function App() {
           onOpenBulletinsModal={() => setIsBulletinsModalOpen(true)}
           onOpenLinksModal={() => setIsLinksModalOpen(true)}
           onOpenChartTab={() => setActiveTab('chart')}
+          onOpenInfographicModal={() => setIsInfographicModalOpen(true)}
         />
 
         {/* Severe Weather Alert Notice Banner (if any) */}
@@ -205,6 +210,38 @@ export function App() {
             </a>
           </div>
         )}
+
+        {/* Card Oficial Diário Quick Banner */}
+        <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 border border-sky-800/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-400 text-slate-950 flex items-center justify-center font-bold shadow-md shrink-0">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <h3 className="font-bold text-sm sm:text-base text-white">
+                  Card Oficial de Acumulados de Chuva
+                </h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">
+                  Estilo Infográfico Diário
+                </span>
+              </div>
+              <p className="text-xs text-slate-300">
+                Gere e baixe a imagem em alta resolução com os acumulados do dia para postar no WhatsApp e redes sociais.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={() => setIsInfographicModalOpen(true)}
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-bold shadow-md transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Gerar & Baixar Card</span>
+            </button>
+          </div>
+        </div>
 
         {/* Section: Interactive Georeferenced Map (Collapsible) */}
         <section className="space-y-2 sm:space-y-2.5">
@@ -393,6 +430,7 @@ export function App() {
               weatherData={weatherData}
               lastUpdated={lastUpdated}
               countdownFormatted={formatCountdown(countdown)}
+              onOpenInfographicModal={() => setIsInfographicModalOpen(true)}
             />
           ) : activeTab === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -463,6 +501,15 @@ export function App() {
         <DailyBulletinsModal 
           isOpen={isBulletinsModalOpen}
           onClose={() => setIsBulletinsModalOpen(false)}
+        />
+
+        {/* Daily Infographic Card Modal */}
+        <DailyInfographicModal 
+          isOpen={isInfographicModalOpen}
+          onClose={() => setIsInfographicModalOpen(false)}
+          stations={stations}
+          weatherData={weatherData}
+          lastUpdated={lastUpdated}
         />
 
         {/* Add Station Modal */}

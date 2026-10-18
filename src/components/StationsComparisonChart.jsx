@@ -12,9 +12,11 @@ import {
   Clock,
   Layers,
   FileText,
-  Table as TableIcon
+  Table as TableIcon,
+  Sparkles
 } from 'lucide-react';
 import { getStationDisplayNameWithCode } from '../data/stations';
+import { generateInfographicCanvas } from '../utils/infographicGenerator';
 
 const RAIN_WINDOWS = [
   { id: '1h', label: '1h (1 hora)', short: '1h' },
@@ -28,7 +30,7 @@ const RAIN_WINDOWS = [
   { id: '96h', label: '96h (96 horas)', short: '96h' }
 ];
 
-export function StationsComparisonChart({ stations, weatherData, lastUpdated, countdownFormatted }) {
+export function StationsComparisonChart({ stations, weatherData, lastUpdated, countdownFormatted, onOpenInfographicModal }) {
   const [metricType, setMetricType] = useState('rain'); // 'rain' | 'rainRate' | 'wind' | 'temp'
   const [rainWindow, setRainWindow] = useState('24h'); // '1h' | '4h' | '6h' | '9h' | '12h' | '24h' | '36h' | '48h' | '96h'
   const [showMatrix, setShowMatrix] = useState(true);
@@ -144,8 +146,17 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
   const step = Math.ceil(axisMax / stepCount);
   const scaleMarks = Array.from({ length: stepCount + 1 }, (_, i) => i * step);
 
-  // Generate PNG image of the chart using HTML5 Canvas
+  // Generate PNG image of the chart using HTML5 Canvas (Infographic Poster for Rain)
   const generateCanvasImage = () => {
+    if (metricType === 'rain') {
+      return generateInfographicCanvas({
+        items: sortedItems,
+        rainWindow,
+        watermark: 'Engmetclima',
+        lastUpdated
+      });
+    }
+
     const canvas = document.createElement('canvas');
     const width = 1100;
     const itemHeight = 52;
@@ -380,8 +391,19 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
           </div>
         </div>
 
-        {/* Action Buttons: Copy Text, Copy Image, Download Image */}
+        {/* Action Buttons: Card Oficial Diário, Copy Text, Copy Image, Download Image */}
         <div className="flex items-center gap-2 flex-wrap">
+          {onOpenInfographicModal && (
+            <button
+              onClick={onOpenInfographicModal}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-semibold shadow-xs transition active:scale-95 cursor-pointer"
+              title="Abrir gerador e pré-visualização do Card Oficial Diário (Infográfico)"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
+              <span>Card Oficial Diário</span>
+            </button>
+          )}
+
           <button
             onClick={handleCopyReportText}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold transition active:scale-95 cursor-pointer"
