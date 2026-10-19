@@ -93,12 +93,12 @@ export const STATIONS = [
     lat: -22.573707,
     lng: -41.985545,
     altitude: 3,
-    description: "Estação PWS em Barra de São João / Praiamar na divisa de Rio das Ostras. No momento desativada no Weather Underground (offline).",
+    description: "Estação meteorológica PWS em Barra de São João / Praiamar na divisa de Rio das Ostras. Conectada e transmitindo dados de chuva, vento e temperatura via EasyWeatherPro.",
     installedYear: 2023,
-    sensorTypes: ["Barômetro", "Termômetro", "Higrômetro"],
-    externalUrl: "https://www.wunderground.com/dashboard/pws/Icasim5",
-    defaultStatus: "offline",
-    statusLabel: "Inativa"
+    sensorTypes: ["Termômetro", "Higrômetro", "Pluviômetro", "Anemômetro", "Barômetro"],
+    externalUrl: "https://www.wunderground.com/dashboard/pws/ICASIM5",
+    defaultStatus: "online",
+    statusLabel: "Ativa"
   },
   {
     id: "IRIODA5",

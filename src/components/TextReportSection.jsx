@@ -71,9 +71,6 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
         if (st.isHydrological && data.riverLevel != null) {
           block += ` (Rio: ${data.riverLevel}m)`;
         }
-        if (data.startTime) {
-          block += ` [Início: ${data.startTime}]`;
-        }
         block += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;
         activeList.push(block);
       }
@@ -194,7 +191,7 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
 
     let text = stationNameWithCode;
     if (st.isHydrological && data.riverLevel != null) text += ` (Rio: ${data.riverLevel}m)`;
-    if (data.startTime) text += ` [Início: ${data.startTime}]`;
+    if (data.startTime && reportFormat !== 'whatsapp') text += ` [Início: ${data.startTime}]`;
 
     if (reportFormat === 'whatsapp') {
       text += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;

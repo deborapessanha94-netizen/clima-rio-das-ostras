@@ -54,7 +54,7 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
       const weather = weatherData[st.id];
       if (weather?.status === 'offline') return false;
       if (weather?.statusLabel === 'Inativa') return false;
-      if (st.defaultStatus === 'offline') return false;
+      if (!weather && st.defaultStatus === 'offline') return false;
       if (weather?.alerts?.some(a => a.severity === 'offline' || a.event === 'Estação Inativa')) return false;
       return true;
     });
@@ -102,7 +102,7 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
       const weather = weatherData[st.id];
       if (weather?.status === 'offline') return false;
       if (weather?.statusLabel === 'Inativa') return false;
-      if (st.defaultStatus === 'offline') return false;
+      if (!weather && st.defaultStatus === 'offline') return false;
       if (weather?.alerts?.some(a => a.severity === 'offline' || a.event === 'Estação Inativa')) return false;
       return true;
     });

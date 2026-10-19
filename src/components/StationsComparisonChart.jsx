@@ -504,9 +504,6 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
         if (item.station?.isHydrological && (item.current?.riverLevel != null || item.station?.riverLevel != null)) {
           block += ` (Rio: ${item.current?.riverLevel ?? item.station?.riverLevel}m)`;
         }
-        if (item.rainStartTime && item.rainStartTime !== '--') {
-          block += ` [Início: ${item.rainStartTime}]`;
-        }
         const parts = selectedWindows.map(w => {
           const val = getAccumulationForHour(item.windows, w, item.value);
           return `${w}: ${val.toFixed(1)}mm`;
