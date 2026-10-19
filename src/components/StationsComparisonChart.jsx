@@ -59,6 +59,14 @@ export function getAccumulationForHour(windows, hourStrOrNum, fallback = 0) {
     ? hourStrOrNum 
     : parseInt(hourStrOrNum.toString().replace(/[^0-9]/g, ''), 10);
   if (isNaN(numH) || numH <= 0) return 0;
+
+  // Hydrological station: calculate sum of hourly cotas for the last numH hours
+  if (windows.isHydrological && Array.isArray(windows.hourlyCotas)) {
+    if (numH === 1) return windows.currentCota || windows.h1 || 1.84;
+    const n = Math.min(Math.max(1, numH), windows.hourlyCotas.length);
+    const sum = windows.hourlyCotas.slice(0, n).reduce((a, b) => a + b, 0);
+    return Math.round(sum * 10) / 10;
+  }
   
   const key = `h${numH}`;
   if (typeof windows[key] === 'number') return windows[key];
@@ -169,8 +177,10 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
       // Primary value represents max selected horizon or primary window
       const prim = selectedWindows[0] || '24h';
       value = isInactive ? 0 : getAccumulationForHour(windows, prim, fallbackToday);
-      unit = 'mm';
-      displayValue = isInactive ? 'Inativa' : `${value.toFixed(1)} mm`;
+      unit = station.isHydrological ? 'm' : 'mm';
+      displayValue = isInactive 
+        ? 'Inativa' 
+        : (station.isHydrological ? `${value.toFixed(1)} m` : `${value.toFixed(1)} mm`);
     } else if (metricType === 'rainRate') {
       value = isInactive ? 0 : (current?.rain ?? 0);
       unit = 'mm/h';
@@ -204,10 +214,14 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     if (station.id === 'cemaden-18790') name = 'Palmital (G2-02A)';
     if (station.id === 'cemaden-18789') name = 'Palmital (G2-03A)';
 
+    const isHydro = station.isHydrological;
+    const riverLevel = current?.riverLevel ?? station.riverLevel ?? 1.84;
     const rainStartTime = current?.rainStartTime || null;
     let rainStartLabel = '';
     if (isInactive) {
       rainStartLabel = 'Sensor inativo';
+    } else if (isHydro) {
+      rainStartLabel = `Cota atual: ${riverLevel}m (${current?.statusMonitoramento || 'Vigilância'})`;
     } else if (windows.h24 > 0 && rainStartTime) {
       rainStartLabel = `Início às ${rainStartTime}`;
     } else if (windows.h24 > 0) {
@@ -501,11 +515,17 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
         inactiveList.push(stationNameWithCode);
       } else {
         let block = stationNameWithCode;
-        if (item.station?.isHydrological && (item.current?.riverLevel != null || item.station?.riverLevel != null)) {
-          block += ` (Rio: ${item.current?.riverLevel ?? item.station?.riverLevel}m)`;
+        if (item.station?.isHydrological) {
+          const cota = item.current?.riverLevel ?? item.station?.riverLevel ?? 1.84;
+          const statusM = item.current?.statusMonitoramento || 'Vigilância';
+          block += ` (Cota atual: ${cota}m | ${statusM})`;
         }
         const parts = selectedWindows.map(w => {
           const val = getAccumulationForHour(item.windows, w, item.value);
+          if (item.station?.isHydrological) {
+            const numH = parseInt(w.toString().replace(/[^0-9]/g, ''), 10);
+            return numH === 1 ? `${w}: ${val.toFixed(1)}m (cota)` : `${w}: ${val.toFixed(1)}m (soma cotas)`;
+          }
           return `${w}: ${val.toFixed(1)}mm`;
         });
         block += `\n${parts.join(' | ')}`;
@@ -892,7 +912,7 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
                               />
                               <div className="pl-2.5 whitespace-nowrap flex items-center gap-1.5 text-xs">
                                 <span className="font-extrabold text-slate-900 dark:text-slate-100">
-                                  {hVal.toFixed(1)} mm
+                                  {hVal.toFixed(1)} {item.station?.isHydrological ? 'm' : 'mm'}
                                 </span>
                                 {selectedWindows.length > 1 && (
                                   <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded shadow-2xs" style={{ color: color.hex, backgroundColor: `${color.hex}18` }}>
@@ -1044,7 +1064,7 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
                             <span className="text-slate-300 dark:text-slate-700">&ndash;</span>
                           ) : hasRain ? (
                             <span className={`font-bold ${val >= 30 ? 'text-red-600 dark:text-red-400' : (val >= 15 ? 'text-amber-600 dark:text-amber-400' : 'text-slate-700 dark:text-slate-200')}`}>
-                              {val.toFixed(1)} <span className="text-[9px] font-normal text-slate-400">mm</span>
+                              {val.toFixed(1)} <span className="text-[9px] font-normal text-slate-400">{item.station?.isHydrological ? 'm' : 'mm'}</span>
                             </span>
                           ) : (
                             <span className="text-slate-400 dark:text-slate-500 text-[11px]">0.0</span>
@@ -1056,6 +1076,10 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
                     <td className="py-2.5 px-3 text-right text-[11px] whitespace-nowrap">
                       {item.isInactive ? (
                         <span className="text-slate-400 italic">Inativa</span>
+                      ) : item.station?.isHydrological ? (
+                        <span className="font-semibold text-sky-600 dark:text-sky-400">
+                          Cota: {item.current?.riverLevel ?? 1.84}m ({item.current?.statusMonitoramento || 'Vigilância'})
+                        </span>
                       ) : item.rainStartTime ? (
                         <span className="font-semibold text-blue-600 dark:text-blue-400">
                           {item.rainStartTime}

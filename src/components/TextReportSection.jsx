@@ -68,10 +68,14 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
         inactiveList.push(stationNameWithCode);
       } else {
         let block = stationNameWithCode;
-        if (st.isHydrological && data.riverLevel != null) {
-          block += ` (Rio: ${data.riverLevel}m)`;
+        if (st.isHydrological) {
+          const cota = data.riverLevel ?? 1.84;
+          const statusM = data.statusMonitoramento || 'Vigilância';
+          block += ` (Cota atual: ${cota}m | ${statusM})`;
+          block += `\n12h: ${data.h12.toFixed(1)}m | 24h: ${data.h24.toFixed(1)}m | 36h: ${data.h36.toFixed(1)}m (soma cotas)`;
+        } else {
+          block += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;
         }
-        block += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;
         activeList.push(block);
       }
     });
@@ -190,14 +194,23 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
     }
 
     let text = stationNameWithCode;
-    if (st.isHydrological && data.riverLevel != null) text += ` (Rio: ${data.riverLevel}m)`;
-    if (data.startTime && reportFormat !== 'whatsapp') text += ` [Início: ${data.startTime}]`;
-
-    if (reportFormat === 'whatsapp') {
-      text += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;
+    if (st.isHydrological) {
+      const cota = data.riverLevel ?? 1.84;
+      const statusM = data.statusMonitoramento || 'Vigilância';
+      text += ` (Cota atual: ${cota}m | ${statusM})`;
+      if (reportFormat === 'whatsapp') {
+        text += `\n12h: ${data.h12.toFixed(1)}m | 24h: ${data.h24.toFixed(1)}m | 36h: ${data.h36.toFixed(1)}m (soma cotas)`;
+      } else {
+        text += `\n1h: ${data.h1.toFixed(1)}m | 4h: ${data.h4.toFixed(1)}m | 6h: ${data.h6.toFixed(1)}m | 12h: ${data.h12.toFixed(1)}m | 24h: ${data.h24.toFixed(1)}m | 36h: ${data.h36.toFixed(1)}m`;
+      }
     } else {
-      text += `\n1h: ${data.h1.toFixed(1)}mm | 4h: ${data.h4.toFixed(1)}mm | 6h: ${data.h6.toFixed(1)}mm | 9h: ${data.h9.toFixed(1)}mm`;
-      text += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm | 48h: ${data.h48.toFixed(1)}mm | 96h: ${data.h96.toFixed(1)}mm`;
+      if (data.startTime && reportFormat !== 'whatsapp') text += ` [Início: ${data.startTime}]`;
+      if (reportFormat === 'whatsapp') {
+        text += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;
+      } else {
+        text += `\n1h: ${data.h1.toFixed(1)}mm | 4h: ${data.h4.toFixed(1)}mm | 6h: ${data.h6.toFixed(1)}mm | 9h: ${data.h9.toFixed(1)}mm`;
+        text += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm | 48h: ${data.h48.toFixed(1)}mm | 96h: ${data.h96.toFixed(1)}mm`;
+      }
     }
 
     try {

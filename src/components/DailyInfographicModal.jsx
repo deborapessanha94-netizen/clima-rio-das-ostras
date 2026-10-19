@@ -40,17 +40,19 @@ const FORMATS = [
 export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, lastUpdated }) {
   const [selectedInterval, setSelectedInterval] = useState('24h');
   const [selectedFormat, setSelectedFormat] = useState('story'); // 'story' | 'post'
-  const [watermark, setWatermark] = useState('tempo@tempoemriodasostras');
+  const [watermark, setWatermark] = useState('@tempoemriodasostras');
+  const [onlyActive, setOnlyActive] = useState(true);
   const [copied, setCopied] = useState(false);
   const [previewDataUrl, setPreviewDataUrl] = useState('');
   const [canvasRef, setCanvasRef] = useState(null);
 
-  // Prepare items for infographic - STRICTLY ACTIVE STATIONS ONLY
+  // Prepare items for infographic
   useEffect(() => {
     if (!isOpen) return;
 
-    // Filter ONLY genuinely online and transmitting active stations
-    const activeStations = stations.filter(st => {
+    // Filter stations based on onlyActive toggle
+    const filteredStations = stations.filter(st => {
+      if (!onlyActive) return true;
       const weather = weatherData[st.id];
       if (weather?.status === 'offline') return false;
       if (weather?.statusLabel === 'Inativa') return false;
@@ -59,10 +61,12 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
       return true;
     });
 
-    const items = activeStations.map(st => {
+    const items = filteredStations.map(st => {
       const weather = weatherData[st.id];
       const current = weather?.current;
-      const fallbackToday = current?.rainToday ?? current?.rainAccumulated24h ?? 0;
+      const isHydro = st.isHydrological;
+      const riverLevel = current?.riverLevel ?? st.riverLevel ?? 1.84;
+      const fallbackToday = isHydro ? riverLevel : (current?.rainToday ?? current?.rainAccumulated24h ?? 0);
       const rawWindows = current?.rainWindows || {};
 
       const winKey = `h${selectedInterval.replace('h', '')}`;
@@ -71,19 +75,21 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
       return {
         station: st,
         value: typeof value === 'number' ? value : 0,
-        isInactive: false,
-        rainStartTime: current?.rainStartTime || null
+        isHydrological: isHydro,
+        riverLevel: riverLevel,
+        isInactive: weather?.status === 'offline',
+        rainStartTime: isHydro ? null : (current?.rainStartTime || null)
       };
     });
 
-    // Sort descending by precipitation accumulation
+    // Sort descending by value
     const sorted = [...items].sort((a, b) => b.value - a.value);
 
     try {
       const canvas = generateInfographicCanvas({
         items: sorted,
         rainWindow: selectedInterval,
-        watermark: watermark || 'tempo@tempoemriodasostras',
+        watermark: watermark || '@tempoemriodasostras',
         lastUpdated,
         format: selectedFormat
       });
@@ -92,13 +98,14 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
     } catch (err) {
       console.error('Error generating infographic preview:', err);
     }
-  }, [isOpen, selectedInterval, selectedFormat, watermark, stations, weatherData, lastUpdated]);
+  }, [isOpen, selectedInterval, selectedFormat, watermark, onlyActive, stations, weatherData, lastUpdated]);
 
   if (!isOpen) return null;
 
   // Download specific format
   const handleDownloadFormat = (fmt) => {
-    const activeStations = stations.filter(st => {
+    const filteredStations = stations.filter(st => {
+      if (!onlyActive) return true;
       const weather = weatherData[st.id];
       if (weather?.status === 'offline') return false;
       if (weather?.statusLabel === 'Inativa') return false;
@@ -107,10 +114,12 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
       return true;
     });
 
-    const items = activeStations.map(st => {
+    const items = filteredStations.map(st => {
       const weather = weatherData[st.id];
       const current = weather?.current;
-      const fallbackToday = current?.rainToday ?? current?.rainAccumulated24h ?? 0;
+      const isHydro = st.isHydrological;
+      const riverLevel = current?.riverLevel ?? st.riverLevel ?? 1.84;
+      const fallbackToday = isHydro ? riverLevel : (current?.rainToday ?? current?.rainAccumulated24h ?? 0);
       const rawWindows = current?.rainWindows || {};
       const winKey = `h${selectedInterval.replace('h', '')}`;
       const value = rawWindows[winKey] ?? fallbackToday;
@@ -118,15 +127,17 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
       return {
         station: st,
         value: typeof value === 'number' ? value : 0,
-        isInactive: false,
-        rainStartTime: current?.rainStartTime || null
+        isHydrological: isHydro,
+        riverLevel: riverLevel,
+        isInactive: weather?.status === 'offline',
+        rainStartTime: isHydro ? null : (current?.rainStartTime || null)
       };
     }).sort((a, b) => b.value - a.value);
 
     const canvas = generateInfographicCanvas({
       items,
       rainWindow: selectedInterval,
-      watermark: watermark || 'tempo@tempoemriodasostras',
+      watermark: watermark || '@tempoemriodasostras',
       lastUpdated,
       format: fmt
     });
@@ -303,15 +314,33 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
               </div>
             </div>
 
-            {/* Stations Scope: Only Active */}
-            <div className="space-y-1.5 pt-2 border-t border-slate-800">
-              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
-                Filtro de Estações
+            {/* Stations Scope: Option to toggle only active vs all */}
+            <div className="space-y-2 pt-2 border-t border-slate-800">
+              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                <span>Filtro de Estações</span>
+                <span className="text-[10px] text-cyan-400 font-mono font-semibold">
+                  {onlyActive ? 'Apenas Ativas' : 'Todas'}
+                </span>
               </label>
-              <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-emerald-300 text-xs flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Exibindo <strong>apenas estações ativas</strong> com transmissão em tempo real.</span>
-              </div>
+              <button
+                type="button"
+                onClick={() => setOnlyActive(!onlyActive)}
+                className={`w-full p-2.5 rounded-xl text-xs flex items-center justify-between border transition cursor-pointer ${
+                  onlyActive 
+                    ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 shadow-xs' 
+                    : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <div className={`w-2.5 h-2.5 rounded-full ${onlyActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
+                  <span className="font-semibold text-left">
+                    {onlyActive ? 'Apenas estações ativas' : 'Exibir todas as estações'}
+                  </span>
+                </div>
+                <div className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 flex items-center ${onlyActive ? 'bg-emerald-600 justify-end' : 'bg-slate-700 justify-start'}`}>
+                  <div className="w-4 h-4 rounded-full bg-white shadow-xs" />
+                </div>
+              </button>
             </div>
 
             {/* Watermark / Signature */}
@@ -324,7 +353,7 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
                 type="text"
                 value={watermark}
                 onChange={(e) => setWatermark(e.target.value)}
-                placeholder="tempo@tempoemriodasostras"
+                placeholder="@tempoemriodasostras"
                 className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-cyan-300 placeholder-slate-600 focus:outline-none focus:border-cyan-500 font-mono font-medium"
               />
               <span className="text-[11px] text-slate-400 block">

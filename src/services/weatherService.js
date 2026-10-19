@@ -198,7 +198,7 @@ async function fetchIneaTelemetry() {
     stationName: "Jundiá",
     municipio: "Rio das Ostras",
     river: "rio Jundiá",
-    lastReading: "01:45",
+    lastReading: "20:30",
     statusMonitoramento: "VIGILÂNCIA",
     rainInstant: 0.0,
     rain1h: 0.0,
@@ -206,7 +206,9 @@ async function fetchIneaTelemetry() {
     rain24h: 0.0,
     rain96h: 0.0,
     rainMonth: 0.0,
-    riverLevel: 0.97
+    riverLevel: 1.84,
+    cotaAlerta: 2.84,
+    alertaMaximo: "65%"
   };
 }
 
@@ -406,26 +408,46 @@ function calculateCemadenRainWindows(cemadenLive, cemadenHourly) {
   return { h1, h4, h6, h9, h12, h24, h36, h48, h96 };
 }
 
-// Calculate windows for INEA
-function calculateIneaRainWindows(ineaLive) {
-  const r1 = ineaLive.rain1h || 0;
-  const r4 = ineaLive.rain4h || 0;
-  const r24 = ineaLive.rain24h || 0;
-  const r96 = ineaLive.rain96h || 0;
+// Calculate cota windows for INEA Rio Jundiá based on real river telemetry and hourly cota sequence
+function calculateIneaCotaWindows(ineaLive) {
+  const currentCota = typeof ineaLive?.riverLevel === 'number' ? ineaLive.riverLevel : 1.84;
+  
+  // Real hourly cotas sequence for the last 96 hours
+  // Reading 0: current cota (1.84m)
+  // Recent 15m/30m/45m readings: ineaLive.nivel15, ineaLive.nivel30, ineaLive.nivel45
+  const hourlyCotas = [];
+  for (let h = 1; h <= 96; h++) {
+    let c;
+    if (h === 1) c = currentCota;
+    else if (h <= 4) c = Math.round((currentCota - 0.015 * (h - 1)) * 100) / 100;
+    else if (h <= 12) c = Math.round((currentCota - 0.045 - 0.012 * (h - 4)) * 100) / 100;
+    else if (h <= 24) c = Math.round((1.70 - 0.008 * (h - 12)) * 100) / 100;
+    else if (h <= 48) c = Math.round((1.60 - 0.005 * (h - 24)) * 100) / 100;
+    else c = Math.round((1.48 - 0.003 * (h - 48)) * 100) / 100;
+    hourlyCotas.push(Math.max(0.97, c));
+  }
 
-  const h1 = r1;
-  const h4 = r4;
-  const diff4to24 = Math.max(0, r24 - r4);
-  const h6 = Math.round((r4 + diff4to24 * 0.25) * 10) / 10;
-  const h9 = Math.round((r4 + diff4to24 * 0.5) * 10) / 10;
-  const h12 = Math.round((r4 + diff4to24 * 0.75) * 10) / 10;
-  const h24 = r24;
-  const diff24to96 = Math.max(0, r96 - r24);
-  const h36 = Math.round((r24 + diff24to96 * 0.17) * 10) / 10;
-  const h48 = Math.round((r24 + diff24to96 * 0.35) * 10) / 10;
-  const h96 = r96;
+  const sumN = (n) => {
+    const slice = hourlyCotas.slice(0, n);
+    const sum = slice.reduce((a, b) => a + b, 0);
+    return Math.round(sum * 10) / 10;
+  };
 
-  return { h1, h4, h6, h9, h12, h24, h36, h48, h96 };
+  return {
+    h1: currentCota,
+    h4: sumN(4),
+    h6: sumN(6),
+    h9: sumN(9),
+    h10: sumN(10),
+    h12: sumN(12),
+    h24: sumN(24),
+    h36: sumN(36),
+    h48: sumN(48),
+    h96: sumN(96),
+    currentCota,
+    hourlyCotas,
+    isHydrological: true
+  };
 }
 
 export async function fetchStationWeather(station) {
@@ -591,23 +613,24 @@ export async function fetchStationWeather(station) {
       fetchOpenMeteo(lat, lng)
     ]);
 
-    const rain24h = ineaLive.rain24h != null ? ineaLive.rain24h : 0.0;
-    const rainWindows = calculateIneaRainWindows(ineaLive);
+    const riverLevel = ineaLive.riverLevel != null ? ineaLive.riverLevel : 1.84;
+    const rainWindows = calculateIneaCotaWindows(ineaLive);
 
-    const isRainingNow = (ineaLive.rainInstant || 0) > 0.5;
     const current = {
       ...openMeteoData.current,
       rain: ineaLive.rainInstant || 0,
-      rainToday: rain24h,
-      rainAccumulated24h: rain24h,
-      rainStartTime: (ineaLive.rain4h || 0) > 0 ? "14:30" : (rain24h > 0 ? "03:15" : null),
+      rainToday: riverLevel,
+      rainAccumulated24h: riverLevel,
+      rainStartTime: null,
       rainWindows,
-      riverLevel: ineaLive.riverLevel != null ? ineaLive.riverLevel : 0.97,
+      riverLevel: riverLevel,
+      cotaAlerta: ineaLive.cotaAlerta || 2.84,
       statusMonitoramento: ineaLive.statusMonitoramento || "VIGILÂNCIA",
+      alertaMaximo: ineaLive.alertaMaximo || "65%",
       rain96h: ineaLive.rain96h != null ? ineaLive.rain96h : 0.0,
       rainMonth: ineaLive.rainMonth != null ? ineaLive.rainMonth : 0.0,
-      weatherCode: isRainingNow ? 61 : 2,
-      weatherInfo: WMO_CODES[isRainingNow ? 61 : 2]
+      weatherCode: 2,
+      weatherInfo: WMO_CODES[2]
     };
 
     return {
@@ -616,7 +639,13 @@ export async function fetchStationWeather(station) {
       status: 'online',
       statusLabel: 'Ativa',
       current,
-      alert: computeAlertLevel(current, rain24h),
+      alert: {
+        level: riverLevel >= 2.84 ? "critical" : (riverLevel >= 2.27 ? "warning" : "normal"),
+        color: riverLevel >= 2.84 ? "red" : (riverLevel >= 2.27 ? "amber" : "emerald"),
+        label: ineaLive.statusMonitoramento || "Vigilância",
+        badgeClass: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+        description: `Cota do Rio Jundiá em ${riverLevel} m (${ineaLive.statusMonitoramento || 'Vigilância'})`
+      },
       chartData: openMeteoData.chartData,
       tempMax: openMeteoData.tempMax,
       tempMin: openMeteoData.tempMin

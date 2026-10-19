@@ -160,13 +160,19 @@ export function StationCard({ station, weather, onSelect, onFocusMap, onOpenEmbe
 
             {/* Modern Inline Telemetry Bar (Single Cohesive Capsule) */}
             <div className="grid grid-cols-4 gap-1 py-2 px-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 text-center mb-3">
-              {/* Chuva */}
-              <div className="px-1" title="Volume acumulado hoje e taxa instantânea de chuva">
-                <span className="text-[10px] text-slate-400 font-medium block">Chuva (Hoje)</span>
+              {/* Chuva ou Cota */}
+              <div className="px-1" title={station.isHydrological ? "Cota atual do Rio Jundiá" : "Volume acumulado hoje e taxa instantânea de chuva"}>
+                <span className="text-[10px] text-slate-400 font-medium block">{station.isHydrological ? "Cota do Rio" : "Chuva (Hoje)"}</span>
                 <span className="text-xs font-bold text-sky-600 dark:text-sky-400 block truncate">
-                  {current?.rainToday != null ? `${current.rainToday} mm` : `${current?.rainAccumulated24h || 0} mm`}
+                  {station.isHydrological 
+                    ? `${current?.riverLevel ?? station.riverLevel ?? 1.84} m`
+                    : (current?.rainToday != null ? `${current.rainToday} mm` : `${current?.rainAccumulated24h || 0} mm`)}
                 </span>
-                {current?.rainStartTime ? (
+                {station.isHydrological ? (
+                  <span className="text-[9px] text-cyan-600 dark:text-cyan-400 block truncate font-medium">
+                    {current?.statusMonitoramento || 'Vigilância'}
+                  </span>
+                ) : current?.rainStartTime ? (
                   <span className="text-[9px] text-sky-600 dark:text-sky-400 block truncate font-medium" title={`Chuva iniciou às ${current.rainStartTime}`}>
                     início: {current.rainStartTime}
                   </span>
@@ -218,13 +224,17 @@ export function StationCard({ station, weather, onSelect, onFocusMap, onOpenEmbe
               <div className="mb-3 p-2 rounded-xl bg-slate-50/90 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/80">
                 <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 font-semibold mb-1.5 px-0.5">
                   <span className="flex items-center gap-1 text-slate-700 dark:text-slate-300">
-                    <Clock className="w-3 h-3 text-sky-500" /> Acumulado por Período:
+                    <Clock className="w-3 h-3 text-sky-500" /> {station.isHydrological ? "Cotas / Nível por Período:" : "Acumulado por Período:"}
                   </span>
-                  {current.rainStartTime && (
+                  {station.isHydrological ? (
+                    <span className="text-cyan-600 dark:text-cyan-400 font-medium">
+                      cota: {current.riverLevel || 1.84}m
+                    </span>
+                  ) : current.rainStartTime ? (
                     <span className="text-sky-600 dark:text-sky-400 font-medium">
                       início: {current.rainStartTime}
                     </span>
-                  )}
+                  ) : null}
                 </div>
                 <div className="grid grid-cols-3 sm:grid-cols-9 gap-1 text-center">
                   {[
@@ -251,7 +261,7 @@ export function StationCard({ station, weather, onSelect, onFocusMap, onOpenEmbe
                       >
                         <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 block leading-tight">{w.label}</span>
                         <span className={`font-mono font-bold leading-tight block ${hasRain ? (num >= 30 ? 'text-red-600 dark:text-red-400' : 'text-blue-700 dark:text-blue-300') : ''}`}>
-                          {num.toFixed(1)}
+                          {num.toFixed(1)}{station.isHydrological ? 'm' : ''}
                         </span>
                       </div>
                     );

@@ -46,7 +46,7 @@ export function formatStationDetailsForInfographic(station) {
 export function generateInfographicCanvas({
   items,
   rainWindow = '24h',
-  watermark = 'tempo@tempoemriodasostras',
+  watermark = '@tempoemriodasostras',
   customTitle = 'ACUMULADOS DE',
   customSubtitle = 'Estações com maiores registros',
   lastUpdated = '',
@@ -235,9 +235,18 @@ export function generateInfographicCanvas({
       : '600 18px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.fillText(network, leftMargin, centerY + (isStory ? 58 : 46));
 
+    const isHydro = Boolean(item.isHydrological || item.station?.isHydrological);
+    const riverLevel = typeof item.riverLevel === 'number' 
+      ? item.riverLevel 
+      : (typeof item.station?.riverLevel === 'number' ? item.station.riverLevel : 1.84);
+
     // Center Column: Rounded Blue Progress Bar (EXTRA THICK & VIBRANT)
-    const barRatio = Math.min(Math.max(item.value / maxVal, 0), 1);
-    const barW = Math.max(barRatio * maxBarWidth, item.value > 0 ? (isStory ? 52 : 46) : 0);
+    // For river stations, bar ratio is riverLevel / 2.84 (2.84m is INEA cota de alerta)
+    const barRatio = isHydro 
+      ? Math.min(Math.max(riverLevel / 2.84, 0), 1)
+      : Math.min(Math.max(item.value / maxVal, 0), 1);
+
+    const barW = Math.max(barRatio * maxBarWidth, (isHydro ? riverLevel > 0 : item.value > 0) ? (isStory ? 52 : 46) : 0);
     const barH = isStory ? 56 : 48;
     const barY = centerY - (barH / 2);
     const pillRadius = barH / 2;
@@ -263,7 +272,7 @@ export function generateInfographicCanvas({
       ctx.stroke();
     }
 
-    // Rain Value Text (HUGE, EXTRA-BOLD WHITE - LIKE REFERENCE POSTER)
+    // Value Text (HUGE, EXTRA-BOLD WHITE - LIKE REFERENCE POSTER)
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffffff';
@@ -271,21 +280,24 @@ export function generateInfographicCanvas({
       ? '900 46px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
       : '900 38px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     const labelX = barStartX + barW + (isStory ? 20 : 16);
-    ctx.fillText(`${item.value.toFixed(1)} mm`, labelX, centerY);
+    const valText = isHydro ? `${riverLevel.toFixed(2)} m` : `${item.value.toFixed(1)} mm`;
+    ctx.fillText(valText, labelX, centerY);
 
-    // Right Column: Rain Start Pill Badge (MUCH LARGER & LEGIBLE)
+    // Right Column: Pill Badge (MUCH LARGER & LEGIBLE)
     const rightPillW = isStory ? 245 : 220;
     const rightPillH = isStory ? 52 : 44;
     const rightPillX = rightMargin - rightPillW;
     const rightPillY = centerY - (rightPillH / 2);
 
-    let rainStartText = '';
-    if (item.rainStartTime && item.rainStartTime !== '--') {
-      rainStartText = `início às ${item.rainStartTime}`;
+    let badgeText = '';
+    if (isHydro) {
+      badgeText = `cota rio: ${riverLevel.toFixed(2)}m`;
+    } else if (item.rainStartTime && item.rainStartTime !== '--') {
+      badgeText = `início às ${item.rainStartTime}`;
     } else if (item.value > 0) {
-      rainStartText = 'com chuva';
+      badgeText = 'com chuva';
     } else {
-      rainStartText = 'sem chuva hoje';
+      badgeText = 'sem chuva hoje';
     }
 
     ctx.strokeStyle = '#0284c7';
@@ -302,7 +314,7 @@ export function generateInfographicCanvas({
       : 'bold 19px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(rainStartText, rightPillX + (rightPillW / 2), centerY);
+    ctx.fillText(badgeText, rightPillX + (rightPillW / 2), centerY);
   });
 
   // 5. Bottom Footer (Substantially Enlarged & Polished)
