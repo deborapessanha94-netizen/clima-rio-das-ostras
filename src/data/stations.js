@@ -25,7 +25,7 @@ export const STATIONS = [
     code: "IRIODA17",
     name: "IRIODA17 - Defesa Civil Municipal",
     shortName: "Defesa Civil",
-    neighborhood: "Defesa Civil / Boca da Barra",
+    neighborhood: "Defesa Civil / Praia da Tartaruga",
     city: "Rio das Ostras",
     category: "Litoral",
     network: "Weather Underground",
@@ -33,7 +33,7 @@ export const STATIONS = [
     lat: -22.531291,
     lng: -41.957444,
     altitude: 3,
-    description: "Estação meteorológica oficial da Defesa Civil de Rio das Ostras conectada ao Weather Underground via EasyWeatherPro.",
+    description: "Estação meteorológica oficial da Defesa Civil de Rio das Ostras conectada ao Weather Underground via EasyWeatherPro na Praia da Tartaruga.",
     installedYear: 2024,
     sensorTypes: ["Termômetro", "Higrômetro", "Anemômetro", "Pluviômetro", "Barômetro", "Radiação Solar"],
     externalUrl: "https://www.wunderground.com/dashboard/pws/IRIODA17",
@@ -221,7 +221,7 @@ export const CATEGORIES = ["Todas", "Litoral", "Urbana", "Rural", "Continental"]
 
 export const NEIGHBORHOODS = [
   "Todos os Bairros",
-  "Defesa Civil / Boca da Barra",
+  "Defesa Civil / Praia da Tartaruga",
   "Escola Jacinto / Costazul",
   "Cantagalo / Extensão do Bosque",
   "Rocha Leão / REBIO União",

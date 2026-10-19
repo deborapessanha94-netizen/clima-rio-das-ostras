@@ -8,6 +8,7 @@ Sistema web centralizado para visualização, análise e acompanhamento em tempo
 ## 📍 Estações de Rio das Ostras Integradas
 
 - **5º Grupo Escoteiro LERIP ([IRIODA16](https://www.wunderground.com/dashboard/pws/IRIODA16))**: Estação PWS no bairro Extensão do Bosque / Centro.
+- **Defesa Civil Municipal ([IRIODA17](https://www.wunderground.com/dashboard/pws/IRIODA17))**: Estação oficial da Defesa Civil Municipal na Praia da Tartaruga.
 - **C. E. Jacintho Xavier Martins ([IRIODA6](https://www.wunderground.com/dashboard/pws/IRIODA6))**: Estação PWS no Colégio Estadual Jacintho Xavier Martins em Costazul.
 - **Parque dos Pássaros ([IRIODA5](https://www.wunderground.com/dashboard/pws/IRIODA5))**: Estação PWS ecológica em Jardim Mariléa.
 - **REBIO União ([IRIODA15](https://www.wunderground.com/dashboard/pws/IRIODA15))**: Monitoramento ambiental na Reserva Biológica União (Mata Atlântica protegida), em Rocha Leão.
