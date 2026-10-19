@@ -50,40 +50,61 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
   useEffect(() => {
     if (!isOpen) return;
 
-    // Filter stations based on onlyActive toggle
+    // Filter stations based on onlyActive toggle (0mm stations are considered inactive)
     const filteredStations = stations.filter(st => {
-      if (!onlyActive) return true;
       const weather = weatherData[st.id];
-      if (weather?.status === 'offline') return false;
-      if (weather?.statusLabel === 'Inativa') return false;
-      if (!weather && st.defaultStatus === 'offline') return false;
-      if (weather?.alerts?.some(a => a.severity === 'offline' || a.event === 'Estação Inativa')) return false;
+      const isHydro = Boolean(st.isHydrological || st.id === 'inea-jundia');
+      const current = weather?.current;
+      const winKey = `h${selectedInterval.replace('h', '')}`;
+      const rawWindows = current?.rainWindows || {};
+      const fallbackToday = isHydro 
+        ? (current?.riverLevel ?? st.riverLevel ?? 1.84) 
+        : (current?.rainToday ?? current?.rainAccumulated24h ?? 0);
+      const val = rawWindows[winKey] ?? fallbackToday;
+
+      if (onlyActive) {
+        if (weather?.status === 'offline') return false;
+        if (weather?.statusLabel === 'Inativa') return false;
+        if (!weather && st.defaultStatus === 'offline') return false;
+        if (weather?.alerts?.some(a => a.severity === 'offline' || a.event === 'Estação Inativa')) return false;
+        // Non-hydrological stations marking 0mm are considered inactive and filtered out
+        if (!isHydro && (!val || val <= 0)) return false;
+        return true;
+      }
       return true;
     });
 
     const items = filteredStations.map(st => {
       const weather = weatherData[st.id];
       const current = weather?.current;
-      const isHydro = st.isHydrological;
+      const isHydro = Boolean(st.isHydrological || st.id === 'inea-jundia');
       const riverLevel = current?.riverLevel ?? st.riverLevel ?? 1.84;
       const fallbackToday = isHydro ? riverLevel : (current?.rainToday ?? current?.rainAccumulated24h ?? 0);
       const rawWindows = current?.rainWindows || {};
 
       const winKey = `h${selectedInterval.replace('h', '')}`;
       const value = rawWindows[winKey] ?? fallbackToday;
+      const numValue = typeof value === 'number' ? value : 0;
+      const isMarkingZero = !isHydro && numValue <= 0;
 
       return {
         station: st,
-        value: typeof value === 'number' ? value : 0,
+        value: numValue,
         isHydrological: isHydro,
         riverLevel: riverLevel,
-        isInactive: weather?.status === 'offline',
+        isInactive: (weather?.status === 'offline') || isMarkingZero,
         rainStartTime: isHydro ? null : (current?.rainStartTime || null)
       };
     });
 
-    // Sort descending by value
-    const sorted = [...items].sort((a, b) => b.value - a.value);
+    // Sort descending by rain accumulation, with Jundiá (isHydrological) ALWAYS placed last!
+    const sorted = [...items].sort((a, b) => {
+      const aHydro = Boolean(a.isHydrological || a.station?.id === 'inea-jundia');
+      const bHydro = Boolean(b.isHydrological || b.station?.id === 'inea-jundia');
+      if (aHydro && !bHydro) return 1;
+      if (!aHydro && bHydro) return -1;
+      return b.value - a.value;
+    });
 
     try {
       const canvas = generateInfographicCanvas({
@@ -105,34 +126,54 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
   // Download specific format
   const handleDownloadFormat = (fmt) => {
     const filteredStations = stations.filter(st => {
-      if (!onlyActive) return true;
       const weather = weatherData[st.id];
-      if (weather?.status === 'offline') return false;
-      if (weather?.statusLabel === 'Inativa') return false;
-      if (!weather && st.defaultStatus === 'offline') return false;
-      if (weather?.alerts?.some(a => a.severity === 'offline' || a.event === 'Estação Inativa')) return false;
+      const isHydro = Boolean(st.isHydrological || st.id === 'inea-jundia');
+      const current = weather?.current;
+      const winKey = `h${selectedInterval.replace('h', '')}`;
+      const rawWindows = current?.rainWindows || {};
+      const fallbackToday = isHydro 
+        ? (current?.riverLevel ?? st.riverLevel ?? 1.84) 
+        : (current?.rainToday ?? current?.rainAccumulated24h ?? 0);
+      const val = rawWindows[winKey] ?? fallbackToday;
+
+      if (onlyActive) {
+        if (weather?.status === 'offline') return false;
+        if (weather?.statusLabel === 'Inativa') return false;
+        if (!weather && st.defaultStatus === 'offline') return false;
+        if (weather?.alerts?.some(a => a.severity === 'offline' || a.event === 'Estação Inativa')) return false;
+        if (!isHydro && (!val || val <= 0)) return false;
+        return true;
+      }
       return true;
     });
 
     const items = filteredStations.map(st => {
       const weather = weatherData[st.id];
       const current = weather?.current;
-      const isHydro = st.isHydrological;
+      const isHydro = Boolean(st.isHydrological || st.id === 'inea-jundia');
       const riverLevel = current?.riverLevel ?? st.riverLevel ?? 1.84;
       const fallbackToday = isHydro ? riverLevel : (current?.rainToday ?? current?.rainAccumulated24h ?? 0);
       const rawWindows = current?.rainWindows || {};
       const winKey = `h${selectedInterval.replace('h', '')}`;
       const value = rawWindows[winKey] ?? fallbackToday;
+      const numValue = typeof value === 'number' ? value : 0;
+      const isMarkingZero = !isHydro && numValue <= 0;
 
       return {
         station: st,
-        value: typeof value === 'number' ? value : 0,
+        value: numValue,
         isHydrological: isHydro,
         riverLevel: riverLevel,
-        isInactive: weather?.status === 'offline',
+        isInactive: (weather?.status === 'offline') || isMarkingZero,
         rainStartTime: isHydro ? null : (current?.rainStartTime || null)
       };
-    }).sort((a, b) => b.value - a.value);
+    }).sort((a, b) => {
+      const aHydro = Boolean(a.isHydrological || a.station?.id === 'inea-jundia');
+      const bHydro = Boolean(b.isHydrological || b.station?.id === 'inea-jundia');
+      if (aHydro && !bHydro) return 1;
+      if (!aHydro && bHydro) return -1;
+      return b.value - a.value;
+    });
 
     const canvas = generateInfographicCanvas({
       items,

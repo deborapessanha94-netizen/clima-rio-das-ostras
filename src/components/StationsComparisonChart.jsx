@@ -152,21 +152,24 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
   const chartItems = stations.map(station => {
     const weather = weatherData[station.id];
     const current = weather?.current;
-    const isInactive = weather?.status === 'offline';
+    const isHydro = Boolean(station.isHydrological || station.id === 'inea-jundia');
+    const isOffline = weather?.status === 'offline';
+    const fallbackToday = current?.rainToday ?? current?.rainAccumulated24h ?? 0;
+    const isMarkingZero = !isHydro && fallbackToday <= 0;
+    const isInactive = isOffline || isMarkingZero;
 
     // Multi-temporal accumulation windows (1h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h)
     const rawWindows = current?.rainWindows || {};
-    const fallbackToday = current?.rainToday ?? current?.rainAccumulated24h ?? 0;
     const windows = {
-      h1: isInactive ? 0 : (rawWindows.h1 ?? Math.round(fallbackToday * 0.15 * 10) / 10),
-      h4: isInactive ? 0 : (rawWindows.h4 ?? Math.round(fallbackToday * 0.55 * 10) / 10),
-      h6: isInactive ? 0 : (rawWindows.h6 ?? Math.round(fallbackToday * 0.75 * 10) / 10),
-      h9: isInactive ? 0 : (rawWindows.h9 ?? Math.round(fallbackToday * 0.9 * 10) / 10),
-      h12: isInactive ? 0 : (rawWindows.h12 ?? fallbackToday),
-      h24: isInactive ? 0 : (rawWindows.h24 ?? fallbackToday),
-      h36: isInactive ? 0 : (rawWindows.h36 ?? fallbackToday),
-      h48: isInactive ? 0 : (rawWindows.h48 ?? fallbackToday),
-      h96: isInactive ? 0 : (rawWindows.h96 ?? fallbackToday)
+      h1: isOffline ? 0 : (rawWindows.h1 ?? Math.round(fallbackToday * 0.15 * 10) / 10),
+      h4: isOffline ? 0 : (rawWindows.h4 ?? Math.round(fallbackToday * 0.55 * 10) / 10),
+      h6: isOffline ? 0 : (rawWindows.h6 ?? Math.round(fallbackToday * 0.75 * 10) / 10),
+      h9: isOffline ? 0 : (rawWindows.h9 ?? Math.round(fallbackToday * 0.9 * 10) / 10),
+      h12: isOffline ? 0 : (rawWindows.h12 ?? fallbackToday),
+      h24: isOffline ? 0 : (rawWindows.h24 ?? fallbackToday),
+      h36: isOffline ? 0 : (rawWindows.h36 ?? fallbackToday),
+      h48: isOffline ? 0 : (rawWindows.h48 ?? fallbackToday),
+      h96: isOffline ? 0 : (rawWindows.h96 ?? fallbackToday)
     };
 
     let value = 0;
@@ -176,26 +179,26 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     if (metricType === 'rain') {
       // Primary value represents max selected horizon or primary window
       const prim = selectedWindows[0] || '24h';
-      value = isInactive ? 0 : getAccumulationForHour(windows, prim, fallbackToday);
-      unit = station.isHydrological ? 'm' : 'mm';
-      displayValue = isInactive 
+      value = isOffline ? 0 : getAccumulationForHour(windows, prim, fallbackToday);
+      unit = isHydro ? 'm' : 'mm';
+      displayValue = isOffline 
         ? 'Inativa' 
-        : (station.isHydrological ? `${value.toFixed(1)} m` : `${value.toFixed(1)} mm`);
+        : (isHydro ? `${value.toFixed(1)} m` : (value <= 0 ? '0.0 mm (inativa)' : `${value.toFixed(1)} mm`));
     } else if (metricType === 'rainRate') {
-      value = isInactive ? 0 : (current?.rain ?? 0);
+      value = isOffline ? 0 : (current?.rain ?? 0);
       unit = 'mm/h';
-      displayValue = isInactive ? 'Inativa' : `${value.toFixed(1)} mm/h`;
+      displayValue = isOffline ? 'Inativa' : `${value.toFixed(1)} mm/h`;
     } else if (metricType === 'wind') {
-      value = isInactive ? 0 : (current?.windSpeed ?? 0);
+      value = isOffline ? 0 : (current?.windSpeed ?? 0);
       unit = 'km/h';
-      displayValue = isInactive ? 'Inativa' : `${value} km/h`;
+      displayValue = isOffline ? 'Inativa' : `${value} km/h`;
     } else if (metricType === 'temp') {
-      value = isInactive ? 0 : (current?.temp ?? 0);
+      value = isOffline ? 0 : (current?.temp ?? 0);
       unit = '°C';
-      displayValue = isInactive ? 'Inativa' : `${value}°C`;
+      displayValue = isOffline ? 'Inativa' : `${value}°C`;
     }
 
-    const maxSelectedRain = isInactive ? 0 : Math.max(
+    const maxSelectedRain = isOffline ? 0 : Math.max(
       ...selectedWindows.map(w => getAccumulationForHour(windows, w, fallbackToday)),
       0
     );
@@ -214,20 +217,21 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     if (station.id === 'cemaden-18790') name = 'Palmital (G2-02A)';
     if (station.id === 'cemaden-18789') name = 'Palmital (G2-03A)';
 
-    const isHydro = station.isHydrological;
     const riverLevel = current?.riverLevel ?? station.riverLevel ?? 1.84;
     const rainStartTime = current?.rainStartTime || null;
     let rainStartLabel = '';
-    if (isInactive) {
+    if (isOffline) {
       rainStartLabel = 'Sensor inativo';
     } else if (isHydro) {
       rainStartLabel = `Cota atual: ${riverLevel}m (${current?.statusMonitoramento || 'Vigilância'})`;
+    } else if (isMarkingZero || windows.h24 <= 0) {
+      rainStartLabel = 'Inativa (0.0 mm)';
     } else if (windows.h24 > 0 && rainStartTime) {
       rainStartLabel = `Início às ${rainStartTime}`;
     } else if (windows.h24 > 0) {
       rainStartLabel = 'Com chuva';
     } else {
-      rainStartLabel = 'Sem chuva hoje';
+      rainStartLabel = 'Inativa (0.0 mm)';
     }
 
     const displayNameWithCode = `${name} (${codeLabel})`;
@@ -252,10 +256,18 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     };
   });
 
-  // Sort items
+  // Sort items: Jundiá always last, active rain stations first, inactive/0mm stations next
   const sortedItems = [...chartItems].sort((a, b) => {
+    // 1. INEA Rio Jundiá (isHydrological) ALWAYS at the very bottom
+    const aHydro = Boolean(a.station?.isHydrological || a.id === 'inea-jundia');
+    const bHydro = Boolean(b.station?.isHydrological || b.id === 'inea-jundia');
+    if (aHydro && !bHydro) return 1;
+    if (!aHydro && bHydro) return -1;
+
+    // 2. Active stations with rain first, inactive/0mm stations after
     if (a.isInactive && !b.isInactive) return 1;
     if (!a.isInactive && b.isInactive) return -1;
+
     if (sortOrder === 'desc') {
       const vA = metricType === 'rain' ? a.maxSelectedRain : a.value;
       const vB = metricType === 'rain' ? b.maxSelectedRain : b.value;

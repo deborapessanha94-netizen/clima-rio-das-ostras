@@ -121,33 +121,6 @@ export const STATIONS = [
     statusLabel: "Inativa"
   },
 
-  // ===================== INEA ALERTA DE CHEIAS =====================
-  {
-    id: "inea-jundia",
-    code: "2241036",
-    name: "2241036 - INEA Telemétrica Rio Jundiá",
-    shortName: "INEA Rio Jundiá",
-    neighborhood: "Jundiá / Cantagalo",
-    city: "Rio das Ostras",
-    category: "Rural",
-    network: "INEA Alerta de Cheias",
-    type: "Telemétrica Hidrometeorológica",
-    river: "rio Jundiá",
-    lat: -22.5120,
-    lng: -41.9700,
-    altitude: 18,
-    isHydrological: true,
-    riverLevel: 1.84,
-    cotaAlerta: 2.84,
-    statusMonitoramento: "VIGILÂNCIA",
-    description: "Estação telemétrica oficial do INEA na bacia do Rio Jundiá em Rio das Ostras. Monitoramento contínuo de cota do rio e precipitação telemétrica a cada 15 min.",
-    installedYear: 2018,
-    sensorTypes: ["Sensor de Nível do Rio (Cotas)", "Pluviômetro Telemétrico"],
-    externalUrl: "https://alertadecheias.com.br",
-    defaultStatus: "online",
-    statusLabel: "Ativa"
-  },
-
   // ===================== CEMADEN PCDs PLUVIOMÉTRICAS =====================
   {
     id: "cemaden-18788",
@@ -206,6 +179,33 @@ export const STATIONS = [
     installedYear: 2017,
     sensorTypes: ["Pluviômetro Telemétrico de Basculamento"],
     externalUrl: "https://resources.cemaden.gov.br/graficos/interativo/grafico_CEMADEN.php?idpcd=18789&uf=RJ",
+    defaultStatus: "online",
+    statusLabel: "Ativa"
+  },
+
+  // ===================== INEA ALERTA DE CHEIAS (HIDROLÓGICA - ÚLTIMA POSIÇÃO) =====================
+  {
+    id: "inea-jundia",
+    code: "2241036",
+    name: "2241036 - INEA Telemétrica Rio Jundiá",
+    shortName: "INEA Rio Jundiá",
+    neighborhood: "Jundiá / Cantagalo",
+    city: "Rio das Ostras",
+    category: "Rural",
+    network: "INEA Alerta de Cheias",
+    type: "Telemétrica Hidrometeorológica",
+    river: "rio Jundiá",
+    lat: -22.5120,
+    lng: -41.9700,
+    altitude: 18,
+    isHydrological: true,
+    riverLevel: 1.84,
+    cotaAlerta: 2.84,
+    statusMonitoramento: "VIGILÂNCIA",
+    description: "Estação telemétrica oficial do INEA na bacia do Rio Jundiá em Rio das Ostras. Monitoramento contínuo de cota do rio e precipitação telemétrica a cada 15 min.",
+    installedYear: 2018,
+    sensorTypes: ["Sensor de Nível do Rio (Cotas)", "Pluviômetro Telemétrico"],
+    externalUrl: "https://alertadecheias.com.br",
     defaultStatus: "online",
     statusLabel: "Ativa"
   }

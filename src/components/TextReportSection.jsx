@@ -50,7 +50,15 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
 
   const displayedStations = stations.filter(st => {
     if (!filterActiveOnly) return true;
-    return weatherData[st.id]?.status !== 'offline';
+    const weather = weatherData[st.id];
+    if (weather?.status === 'offline') return false;
+    const isHydro = Boolean(st.isHydrological || st.id === 'inea-jundia');
+    if (!isHydro) {
+      const current = weather?.current;
+      const rain = current?.rainToday ?? current?.rainAccumulated24h ?? 0;
+      if (rain <= 0) return false;
+    }
+    return true;
   });
 
   // 1. MINIMALIST WHATSAPP FORMAT (Clean, zero clutter, concise, no asterisks, only 12h, 24h, 36h)
@@ -63,12 +71,16 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
 
     displayedStations.forEach(st => {
       const data = getStationWindows(st);
+      const isHydro = Boolean(st.isHydrological || st.id === 'inea-jundia');
+      const isMarkingZero = !isHydro && (data.h24 <= 0 && data.h12 <= 0 && data.h36 <= 0);
+      const isInactive = data.isInactive || isMarkingZero;
       const stationNameWithCode = getStationDisplayNameWithCode(st);
-      if (data.isInactive) {
-        inactiveList.push(stationNameWithCode);
+
+      if (isInactive) {
+        inactiveList.push(`${stationNameWithCode}${isMarkingZero ? ' (0mm)' : ''}`);
       } else {
         let block = stationNameWithCode;
-        if (st.isHydrological) {
+        if (isHydro) {
           const cota = data.riverLevel ?? 1.84;
           const statusM = data.statusMonitoramento || 'Vigilância';
           block += ` (Cota atual: ${cota}m | ${statusM})`;
@@ -76,11 +88,18 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
         } else {
           block += `\n12h: ${data.h12.toFixed(1)}mm | 24h: ${data.h24.toFixed(1)}mm | 36h: ${data.h36.toFixed(1)}mm`;
         }
-        activeList.push(block);
+        activeList.push({ block, isHydro });
       }
     });
 
-    text += activeList.join('\n\n');
+    // Sort activeList: rain stations first, and Jundiá ALWAYS last!
+    activeList.sort((a, b) => {
+      if (a.isHydro && !b.isHydro) return 1;
+      if (!a.isHydro && b.isHydro) return -1;
+      return 0;
+    });
+
+    text += activeList.map(item => item.block).join('\n\n');
 
     if (inactiveList.length > 0 && !filterActiveOnly) {
       text += `\n\nInativas: ${inactiveList.join(', ')}`;

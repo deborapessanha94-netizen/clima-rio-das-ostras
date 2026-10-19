@@ -292,12 +292,14 @@ export function generateInfographicCanvas({
     let badgeText = '';
     if (isHydro) {
       badgeText = `cota rio: ${riverLevel.toFixed(2)}m`;
+    } else if (item.isInactive || item.value <= 0) {
+      badgeText = 'inativa (0 mm)';
     } else if (item.rainStartTime && item.rainStartTime !== '--') {
       badgeText = `início às ${item.rainStartTime}`;
     } else if (item.value > 0) {
       badgeText = 'com chuva';
     } else {
-      badgeText = 'sem chuva hoje';
+      badgeText = 'inativa (0 mm)';
     }
 
     ctx.strokeStyle = '#0284c7';
