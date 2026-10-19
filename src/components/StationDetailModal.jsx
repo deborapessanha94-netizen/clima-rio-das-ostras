@@ -180,10 +180,10 @@ export function StationDetailModal({ station, weather, onClose }) {
                         Telemetria Fluvial INEA &bull; Estação 2241036
                       </span>
                       <div className="text-base font-bold text-slate-900 dark:text-slate-100">
-                        {station.river}: Cota Atual de <span className="text-cyan-700 dark:text-cyan-300 font-extrabold">{current?.riverLevel != null ? `${current.riverLevel} m` : (station.riverLevel != null ? `${station.riverLevel} m` : '1.39 m')}</span>
+                        {station.river}: Cota Atual de <span className="text-cyan-700 dark:text-cyan-300 font-extrabold">{current?.riverLevel != null ? `${current.riverLevel} m` : (station.riverLevel != null ? `${station.riverLevel} m` : '0.97 m')}</span>
                       </div>
                       <div className="text-xs text-slate-500 dark:text-slate-400">
-                        Estágio: <strong className="text-emerald-600 dark:text-emerald-400 font-semibold">{current?.statusMonitoramento || station.statusMonitoramento || 'VIGILÂNCIA'}</strong> &bull; Chuva 96h: <strong className="text-sky-600 dark:text-sky-400">{current?.rain96h || 18.4} mm</strong> &bull; Mês: <strong className="text-sky-600 dark:text-sky-400">{current?.rainMonth || 169.8} mm</strong>
+                        Estágio: <strong className="text-emerald-600 dark:text-emerald-400 font-semibold">{current?.statusMonitoramento || station.statusMonitoramento || 'VIGILÂNCIA'}</strong> &bull; Chuva 96h: <strong className="text-sky-600 dark:text-sky-400">{current?.rain96h ?? 0.0} mm</strong> &bull; Mês: <strong className="text-sky-600 dark:text-sky-400">{current?.rainMonth ?? 0.0} mm</strong>
                       </div>
                     </div>
                   </div>

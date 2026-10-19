@@ -15,20 +15,20 @@ export default async function handler(req, res) {
     stationName: "Jundiá",
     municipio: "Rio das Ostras",
     river: "rio Jundiá",
-    lastReading: "23:15",
+    lastReading: "01:45",
     statusMonitoramento: "VIGILÂNCIA",
     rainInstant: 0.0,
     rain1h: 0.0,
-    rain4h: 1.0,
-    rain24h: 1.2,
-    rain96h: 18.4,
-    rainMonth: 169.8,
-    riverLevel: 1.39
+    rain4h: 0.0,
+    rain24h: 0.0,
+    rain96h: 0.0,
+    rainMonth: 0.0,
+    riverLevel: 0.97
   };
 
   const options = {
     rejectUnauthorized: false,
-    timeout: 8000,
+    timeout: 12000,
     headers: {
       'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
@@ -54,23 +54,25 @@ export default async function handler(req, res) {
     upstreamRes.on('end', () => {
       try {
         let jundiaData = { ...defaultJundiaData };
-        const trs = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gis) || [];
-        const rdoTr = trs.find(t => t.includes('Rio das Ostras') && (t.includes('2241036') || t.includes('Jundiá')));
+        const idx = html.indexOf('2241036');
+        if (idx !== -1) {
+          const start = html.lastIndexOf('<tr', idx);
+          const end = html.indexOf('</tr>', idx) + 5;
+          const rdoTr = html.slice(start, end);
 
-        if (rdoTr) {
           const tds = rdoTr.match(/<td[^>]*>([\s\S]*?)<\/td>/gi) || [];
-          const cleanCols = tds.map(c => c.replace(/<[^>]+>/g, '').trim()).filter(Boolean);
+          const cleanCols = tds.map(c => c.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').trim());
           
-          if (cleanCols.length >= 12) {
-            jundiaData.lastReading = cleanCols[3].slice(-5);
-            jundiaData.statusMonitoramento = cleanCols[4];
-            jundiaData.rainInstant = parseFloat(cleanCols[5]) || 0;
-            jundiaData.rain1h = parseFloat(cleanCols[6]) || 0;
-            jundiaData.rain4h = parseFloat(cleanCols[7]) || 0;
-            jundiaData.rain24h = parseFloat(cleanCols[8]) || 1.2;
-            jundiaData.rain96h = parseFloat(cleanCols[9]) || 18.4;
-            jundiaData.rainMonth = parseFloat(cleanCols[10]) || 169.8;
-            jundiaData.riverLevel = parseFloat(cleanCols[11]) || 1.39;
+          if (cleanCols.length >= 14) {
+            jundiaData.lastReading = cleanCols[4]?.slice(-5) || cleanCols[4];
+            jundiaData.statusMonitoramento = cleanCols[5]?.replace(/&Acirc;/g, 'Â')?.replace(/&acirc;/g, 'â') || 'VIGILÂNCIA';
+            jundiaData.rainInstant = parseFloat(cleanCols[6]) || 0.0;
+            jundiaData.rain1h = parseFloat(cleanCols[7]) || 0.0;
+            jundiaData.rain4h = parseFloat(cleanCols[8]) || 0.0;
+            jundiaData.rain24h = parseFloat(cleanCols[9]) || 0.0;
+            jundiaData.rain96h = parseFloat(cleanCols[10]) || 0.0;
+            jundiaData.rainMonth = parseFloat(cleanCols[11]) || 0.0;
+            jundiaData.riverLevel = parseFloat(cleanCols[13]) || 0.97;
           }
         }
 

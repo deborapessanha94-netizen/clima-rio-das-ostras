@@ -103,7 +103,7 @@ export function StationCard({ station, weather, onSelect, onFocusMap, onOpenEmbe
                 <div className="flex items-center gap-1.5">
                   <Waves className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 flex-shrink-0" />
                   <span className="text-slate-700 dark:text-slate-300 font-medium">
-                    Rio Jundiá: <strong className="text-cyan-800 dark:text-cyan-300 font-extrabold">{current?.riverLevel != null ? `${current.riverLevel} m` : (station.riverLevel != null ? `${station.riverLevel} m` : '1.38 m')}</strong>
+                    Rio Jundiá: <strong className="text-cyan-800 dark:text-cyan-300 font-extrabold">{current?.riverLevel != null ? `${current.riverLevel} m` : (station.riverLevel != null ? `${station.riverLevel} m` : '0.97 m')}</strong>
                   </span>
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-300 bg-cyan-100 dark:bg-cyan-900/60 px-2 py-0.5 rounded-md">

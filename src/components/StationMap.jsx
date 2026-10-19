@@ -169,7 +169,7 @@ export function StationMap({ stations, weatherData, selectedStation, onSelectSta
         ${station.isHydrological ? `
           <div class="bg-cyan-50 dark:bg-cyan-950/50 p-2 rounded-xl mb-2 text-xs border border-cyan-200 dark:border-cyan-800/60">
             <div class="text-[10px] text-cyan-700 dark:text-cyan-400 font-bold uppercase">${station.river}</div>
-            <div class="font-bold text-slate-900 dark:text-slate-100">Nível do Rio: <span class="text-cyan-700 dark:text-cyan-300">${weather?.current?.riverLevel != null ? weather.current.riverLevel + ' m' : (station.riverLevel != null ? station.riverLevel + ' m' : '1.39 m')}</span></div>
+            <div class="font-bold text-slate-900 dark:text-slate-100">Nível do Rio: <span class="text-cyan-700 dark:text-cyan-300">${weather?.current?.riverLevel != null ? weather.current.riverLevel + ' m' : (station.riverLevel != null ? station.riverLevel + ' m' : '0.97 m')}</span></div>
             <div class="text-[10px] text-slate-500">Status: ${weather?.current?.statusMonitoramento || station.statusMonitoramento || 'Vigilância'}</div>
           </div>
         ` : ''}

@@ -213,7 +213,7 @@ export function ComparisonTable({ stations, weatherData, onSelectStation, onFocu
 
                   <td className="py-2.5 px-3 font-semibold text-cyan-700 dark:text-cyan-400">
                     {station.isHydrological ? (
-                      <span>{current?.riverLevel != null ? `${current.riverLevel} m` : (station.riverLevel != null ? `${station.riverLevel} m` : '1.39 m')}</span>
+                      <span>{current?.riverLevel != null ? `${current.riverLevel} m` : (station.riverLevel != null ? `${station.riverLevel} m` : '0.97 m')}</span>
                     ) : (
                       <span className="text-slate-400 font-normal">&ndash;</span>
                     )}

@@ -137,7 +137,7 @@ export const STATIONS = [
     lng: -41.9700,
     altitude: 18,
     isHydrological: true,
-    riverLevel: 1.39,
+    riverLevel: 0.97,
     statusMonitoramento: "VIGILÂNCIA",
     description: "Estação telemétrica oficial do INEA na bacia do Rio Jundiá em Rio das Ostras. Nível do rio e precipitação telemétrica a cada 15 min.",
     installedYear: 2018,

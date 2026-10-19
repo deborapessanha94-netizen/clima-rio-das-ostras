@@ -198,15 +198,15 @@ async function fetchIneaTelemetry() {
     stationName: "Jundiá",
     municipio: "Rio das Ostras",
     river: "rio Jundiá",
-    lastReading: "23:15",
+    lastReading: "01:45",
     statusMonitoramento: "VIGILÂNCIA",
     rainInstant: 0.0,
     rain1h: 0.0,
-    rain4h: 1.0,
-    rain24h: 1.2,
-    rain96h: 18.4,
-    rainMonth: 169.8,
-    riverLevel: 1.39
+    rain4h: 0.0,
+    rain24h: 0.0,
+    rain96h: 0.0,
+    rainMonth: 0.0,
+    riverLevel: 0.97
   };
 }
 
@@ -591,7 +591,7 @@ export async function fetchStationWeather(station) {
       fetchOpenMeteo(lat, lng)
     ]);
 
-    const rain24h = ineaLive.rain24h != null ? ineaLive.rain24h : 1.2;
+    const rain24h = ineaLive.rain24h != null ? ineaLive.rain24h : 0.0;
     const rainWindows = calculateIneaRainWindows(ineaLive);
 
     const isRainingNow = (ineaLive.rainInstant || 0) > 0.5;
@@ -602,10 +602,10 @@ export async function fetchStationWeather(station) {
       rainAccumulated24h: rain24h,
       rainStartTime: (ineaLive.rain4h || 0) > 0 ? "14:30" : (rain24h > 0 ? "03:15" : null),
       rainWindows,
-      riverLevel: ineaLive.riverLevel || 1.39,
+      riverLevel: ineaLive.riverLevel != null ? ineaLive.riverLevel : 0.97,
       statusMonitoramento: ineaLive.statusMonitoramento || "VIGILÂNCIA",
-      rain96h: ineaLive.rain96h || 18.4,
-      rainMonth: ineaLive.rainMonth || 169.8,
+      rain96h: ineaLive.rain96h != null ? ineaLive.rain96h : 0.0,
+      rainMonth: ineaLive.rainMonth != null ? ineaLive.rainMonth : 0.0,
       weatherCode: isRainingNow ? 61 : 2,
       weatherInfo: WMO_CODES[isRainingNow ? 61 : 2]
     };
