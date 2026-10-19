@@ -297,12 +297,13 @@ async function fetchCemadenHourlyTelemetry(stationCode) {
   return null;
 }
 
-// Calculate accumulation windows (1h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h) from hourly observations
+// Calculate accumulation windows (1h, 3h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h) from hourly observations
 function calculateRainWindowsFromHourly(hourlyList, currentRainToday = 0) {
   const r = Math.round(currentRainToday * 10) / 10;
   if (!hourlyList || hourlyList.length === 0) {
     return {
       h1: Math.min(r, Math.round(r * 0.15 * 10) / 10),
+      h3: Math.min(r, Math.round(r * 0.40 * 10) / 10),
       h4: Math.min(r, Math.round(r * 0.55 * 10) / 10),
       h6: Math.min(r, Math.round(r * 0.75 * 10) / 10),
       h9: Math.min(r, Math.round(r * 0.9 * 10) / 10),
@@ -349,6 +350,7 @@ function calculateRainWindowsFromHourly(hourlyList, currentRainToday = 0) {
 
   return {
     h1: sumLastHours(1),
+    h3: sumLastHours(3),
     h4: sumLastHours(4),
     h6: sumLastHours(6),
     h9: sumLastHours(9),
@@ -396,6 +398,7 @@ function calculateCemadenRainWindows(cemadenLive, cemadenHourly) {
   };
 
   const h1 = sumHours(1) ?? a1;
+  const h3 = sumHours(3) ?? a3;
   const h4 = sumHours(4) ?? (a3 > 0 ? Math.round((a3 + (a6 - a3) * 0.33) * 10) / 10 : Math.round(a6 * 0.6 * 10) / 10);
   const h6 = sumHours(6) ?? a6;
   const h9 = sumHours(9) ?? (a6 > 0 ? Math.round((a6 + (a12 - a6) * 0.5) * 10) / 10 : Math.round(a12 * 0.75 * 10) / 10);
@@ -405,7 +408,7 @@ function calculateCemadenRainWindows(cemadenLive, cemadenHourly) {
   const h36 = sumHours(36) ?? Math.round((h24 + (h48 - h24) * 0.5) * 10) / 10;
   const h96 = Math.max(h48, a96);
 
-  return { h1, h4, h6, h9, h12, h24, h36, h48, h96 };
+  return { h1, h3, h4, h6, h9, h12, h24, h36, h48, h96 };
 }
 
 // Calculate cota windows for INEA Rio Jundiá based on real river telemetry and hourly cota sequence
@@ -435,6 +438,7 @@ function calculateIneaCotaWindows(ineaLive) {
 
   return {
     h1: currentCota,
+    h3: sumN(3),
     h4: sumN(4),
     h6: sumN(6),
     h9: sumN(9),

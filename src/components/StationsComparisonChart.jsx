@@ -74,6 +74,7 @@ export function getAccumulationForHour(windows, hourStrOrNum, fallback = 0) {
   const known = [
     { h: 0, val: 0 },
     { h: 1, val: windows.h1 ?? 0 },
+    { h: 3, val: windows.h3 ?? (windows.h1 ? windows.h1 * 2 : 0) },
     { h: 4, val: windows.h4 ?? (windows.h1 ?? 0) * 1.5 },
     { h: 6, val: windows.h6 ?? windows.h4 ?? 0 },
     { h: 9, val: windows.h9 ?? windows.h6 ?? 0 },
@@ -158,10 +159,11 @@ export function StationsComparisonChart({ stations, weatherData, lastUpdated, co
     const isMarkingZero = !isHydro && fallbackToday <= 0;
     const isInactive = isOffline || isMarkingZero;
 
-    // Multi-temporal accumulation windows (1h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h)
+    // Multi-temporal accumulation windows (1h, 3h, 4h, 6h, 9h, 12h, 24h, 36h, 48h, 96h)
     const rawWindows = current?.rainWindows || {};
     const windows = {
       h1: isOffline ? 0 : (rawWindows.h1 ?? Math.round(fallbackToday * 0.15 * 10) / 10),
+      h3: isOffline ? 0 : (rawWindows.h3 ?? Math.round(fallbackToday * 0.40 * 10) / 10),
       h4: isOffline ? 0 : (rawWindows.h4 ?? Math.round(fallbackToday * 0.55 * 10) / 10),
       h6: isOffline ? 0 : (rawWindows.h6 ?? Math.round(fallbackToday * 0.75 * 10) / 10),
       h9: isOffline ? 0 : (rawWindows.h9 ?? Math.round(fallbackToday * 0.9 * 10) / 10),

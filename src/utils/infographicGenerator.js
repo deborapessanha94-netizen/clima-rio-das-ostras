@@ -324,27 +324,26 @@ export function generateInfographicCanvas({
   ctx.strokeStyle = '#00e5ff';
   ctx.lineWidth = isStory ? 5 : 4;
   ctx.beginPath();
-  ctx.moveTo(leftMargin, footerY);
-  ctx.lineTo(leftMargin + (isStory ? 55 : 46), footerY);
+  ctx.moveTo(leftMargin, footerY - (isStory ? 12 : 10));
+  ctx.lineTo(leftMargin + (isStory ? 50 : 42), footerY - (isStory ? 12 : 10));
   ctx.stroke();
 
-  // Signature / Watermark text: tempo@tempoemriodasostras (Bold, Bright White)
+  // Signature / Watermark text: @tempoemriodasostras (Bold, Bright White)
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
   ctx.fillStyle = '#f8fafc';
   ctx.font = isStory 
-    ? 'bold 30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    : 'bold 25px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText(watermark, leftMargin + (isStory ? 72 : 60), footerY);
+    ? 'bold 28px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    : 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText(watermark, leftMargin + (isStory ? 64 : 54), footerY - (isStory ? 12 : 10));
 
-  // Right footer: Fontes das estações de cada bairro (Bold, Slate Gray)
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
+  // Subtitle line below watermark: Fontes oficiais (Slate Gray, perfectly separated without collision)
+  ctx.textAlign = 'left';
   ctx.fillStyle = '#94a3b8';
   ctx.font = isStory 
-    ? 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-    : 'bold 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-  ctx.fillText('Fontes: Estações de cada bairro • Rio das Ostras - RJ', rightMargin, footerY);
+    ? '600 20px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    : '600 17px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+  ctx.fillText('Fontes: Estações de cada bairro • Rio das Ostras - RJ', leftMargin, footerY + (isStory ? 24 : 18));
 
   return canvas;
 }

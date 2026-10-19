@@ -30,6 +30,7 @@ export function TextReportSection({ stations, weatherData, lastUpdated }) {
     return {
       isInactive,
       h1: isInactive ? 0 : (raw.h1 ?? Math.round(fallbackToday * 0.15 * 10) / 10),
+      h3: isInactive ? 0 : (raw.h3 ?? Math.round(fallbackToday * 0.40 * 10) / 10),
       h4: isInactive ? 0 : (raw.h4 ?? Math.round(fallbackToday * 0.55 * 10) / 10),
       h6: isInactive ? 0 : (raw.h6 ?? Math.round(fallbackToday * 0.75 * 10) / 10),
       h9: isInactive ? 0 : (raw.h9 ?? Math.round(fallbackToday * 0.9 * 10) / 10),

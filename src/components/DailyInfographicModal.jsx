@@ -14,12 +14,15 @@ import {
 } from 'lucide-react';
 import { generateInfographicCanvas } from '../utils/infographicGenerator';
 
-// Ordered exactly as requested: 6h, 12h, 24h, 36h
+// Ordered intervals: 1h, 3h, 6h, 12h, 24h, 36h, 48h
 const INTERVALS = [
+  { id: '1h', label: '1 Hora' },
+  { id: '3h', label: '3 Horas' },
   { id: '6h', label: '6 Horas' },
   { id: '12h', label: '12 Horas' },
   { id: '24h', label: '24 Horas' },
-  { id: '36h', label: '36 Horas' }
+  { id: '36h', label: '36 Horas' },
+  { id: '48h', label: '48 Horas' }
 ];
 
 const FORMATS = [
@@ -338,11 +341,13 @@ export function DailyInfographicModal({ isOpen, onClose, stations, weatherData, 
                 Intervalo de Acumulado
               </label>
               <div className="grid grid-cols-2 gap-1.5">
-                {INTERVALS.map(int => (
+                {INTERVALS.map((int, idx) => (
                   <button
                     key={int.id}
                     onClick={() => setSelectedInterval(int.id)}
-                    className={`px-3 py-2.5 rounded-xl text-xs font-medium transition cursor-pointer flex items-center justify-between ${
+                    className={`px-3 py-2 rounded-xl text-xs font-medium transition cursor-pointer flex items-center justify-between ${
+                      idx === INTERVALS.length - 1 && INTERVALS.length % 2 !== 0 ? 'col-span-2' : ''
+                    } ${
                       selectedInterval === int.id
                         ? 'bg-sky-600 text-white font-semibold shadow-md'
                         : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300'
