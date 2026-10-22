@@ -173,7 +173,7 @@ function apiProxyPlugin() {
             res.end(JSON.stringify({ error: 'Missing station id' }));
             return;
           }
-          const apiKey = 'e1f10a1e78da46f5b10a1e78da96f525';
+          const apiKey = 'f6d2efe5720d47ea92efe5720df7eaa8';
           const targetUrl = `https://api.weather.com/v2/pws/observations/current?stationId=${stationId}&format=json&units=m&apiKey=${apiKey}`;
 
           https.get(targetUrl, (upstreamRes) => {
@@ -210,7 +210,7 @@ function apiProxyPlugin() {
             res.end(JSON.stringify({ error: 'Missing station id' }));
             return;
           }
-          const apiKey = 'e1f10a1e78da46f5b10a1e78da96f525';
+          const apiKey = 'f6d2efe5720d47ea92efe5720df7eaa8';
           const targetUrl = `https://api.weather.com/v2/pws/observations/hourly/7day?stationId=${stationId}&format=json&units=m&apiKey=${apiKey}`;
 
           https.get(targetUrl, (upstreamRes) => {
@@ -247,7 +247,7 @@ function apiProxyPlugin() {
             res.end(JSON.stringify({ error: 'Missing station id' }));
             return;
           }
-          const apiKey = 'e1f10a1e78da46f5b10a1e78da96f525';
+          const apiKey = 'f6d2efe5720d47ea92efe5720df7eaa8';
           const targetUrl = `https://api.weather.com/v2/pws/dailysummary/7day?stationId=${stationId}&format=json&units=m&apiKey=${apiKey}`;
 
           https.get(targetUrl, (upstreamRes) => {
@@ -284,7 +284,7 @@ function apiProxyPlugin() {
             res.end(JSON.stringify({ error: 'Missing station id' }));
             return;
           }
-          const apiKey = 'e1f10a1e78da46f5b10a1e78da96f525';
+          const apiKey = 'f6d2efe5720d47ea92efe5720df7eaa8';
           const targetUrl = `https://api.weather.com/v2/pws/observations/all/1day?stationId=${stationId}&format=json&units=m&apiKey=${apiKey}`;
 
           https.get(targetUrl, (upstreamRes) => {
