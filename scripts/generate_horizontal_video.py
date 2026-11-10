@@ -398,7 +398,7 @@ def render_scene_6(draw, frame_img, rel_frame):
         target_h = int(full_card.height * (target_w / full_card.width))
         c_resized = full_card.resize((target_w, target_h), Image.Resampling.LANCZOS)
         cx = (WIDTH - target_w) // 2
-        cy = (HEIGHT - target_h) // 2 - 40
+        cy = (HEIGHT - target_h) // 2 - 30
         
         draw_rounded_rect(draw, (cx - 10, cy - 10, cx + target_w + 10, cy + target_h + 10), fill=(255, 130, 68), radius=28)
         frame_img.paste(c_resized, (cx, cy), c_resized)
@@ -406,8 +406,8 @@ def render_scene_6(draw, frame_img, rel_frame):
     f_t1 = get_font(True, 44)
     draw.text((WIDTH // 2, 110), "ACOMPANHE O CLIMA DIARIAMENTE EM RIO DAS OSTRAS!", font=f_t1, fill=(255, 255, 255), anchor="mm")
 
-    f_t2 = get_font(True, 32)
-    draw.text((WIDTH // 2, HEIGHT - 130), "Instagram & TikTok: @tempoemriodasostras   •   X: @tempoemro", font=f_t2, fill=(255, 130, 68), anchor="mm")
+    f_t2 = get_font(True, 30)
+    draw.text((WIDTH // 2, HEIGHT - 130), "Previsões diárias, radares e alertas oficiais da Defesa Civil", font=f_t2, fill=(56, 189, 248), anchor="mm")
 
 def main():
     out_dir = "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/videos"

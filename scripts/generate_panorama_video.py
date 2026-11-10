@@ -400,38 +400,42 @@ def render_scene_5(draw, frame_img, rel_frame):
 # SCENE 6: ENCERRAMENTO OFICIAL COM IDENTIDADE VISUAL
 def render_scene_6(draw, frame_img, rel_frame):
     f_t1 = get_font(True, 52)
-    draw.text((WIDTH // 2, 220), "ACOMPANHE DIARIAMENTE!", font=f_t1, fill=(255, 255, 255), anchor="mm")
+    draw.text((WIDTH // 2, 230), "ACOMPANHE O CLIMA DIARIAMENTE!", font=f_t1, fill=(255, 255, 255), anchor="mm")
 
     f_t2 = get_font(False, 28)
-    draw.text((WIDTH // 2, 285), "Alertas, chuvas em tempo real e monitoramento oficial", font=f_t2, fill=(56, 189, 248), anchor="mm")
+    draw.text((WIDTH // 2, 295), "Previsões diárias, alertas e monitoramento em tempo real", font=f_t2, fill=(56, 189, 248), anchor="mm")
 
     if full_card:
-        target_w = 960
+        target_w = 980
         target_h = int(full_card.height * (target_w / full_card.width))
         c_resized = full_card.resize((target_w, target_h), Image.Resampling.LANCZOS)
         cx = (WIDTH - target_w) // 2
-        cy = 380
+        cy = 400
         
-        draw_rounded_rect(draw, (cx - 8, cy - 8, cx + target_w + 8, cy + target_h + 8), fill=(255, 130, 68), radius=28)
+        draw_rounded_rect(draw, (cx - 10, cy - 10, cx + target_w + 10, cy + target_h + 10), fill=(255, 130, 68), radius=28)
         frame_img.paste(c_resized, (cx, cy), c_resized)
         
-        box_y = cy + target_h + 50
+        box_y = cy + target_h + 60
     else:
         box_y = 900
 
-    draw_rounded_rect(draw, (80, box_y, WIDTH - 80, box_y + 440), fill=(18, 30, 56), outline=(255, 130, 68), radius=32, width=3)
+    box_h = 360
+    draw_rounded_rect(draw, (80, box_y, WIDTH - 80, box_y + box_h), fill=(18, 30, 56), outline=(56, 189, 248), radius=28, width=2)
 
-    f_social_t = get_font(True, 36)
-    draw.text((WIDTH // 2, box_y + 60), "SIGA NOSSAS REDES OFICIAIS:", font=f_social_t, fill=(255, 255, 255), anchor="mm")
+    draw.text((WIDTH // 2, box_y + 55), "MONITORAMENTO COMPLETO DA CIDADE", font=get_font(True, 32), fill=(255, 255, 255), anchor="mm")
 
-    f_handle = get_font(True, 42)
-    draw.text((WIDTH // 2, box_y + 145), "Instagram: @tempoemriodasostras", font=f_handle, fill=(255, 130, 68), anchor="mm")
-    draw.text((WIDTH // 2, box_y + 220), "TikTok: @tempoemriodasostras", font=f_handle, fill=(56, 189, 248), anchor="mm")
-    draw.text((WIDTH // 2, box_y + 295), "X (Twitter): @tempoemro", font=f_handle, fill=(241, 245, 249), anchor="mm")
+    items = [
+        "Avisos de frentes frias, chuvas intensas e ressacas",
+        "Acumulados de chuva em todas as estações municipais",
+        "Boletins diários com tendências da temperatura e ventos"
+    ]
+    for i, it in enumerate(items):
+        iy = box_y + 115 + i * 50
+        draw.text((130, iy), "•", font=get_font(True, 28), fill=(255, 130, 68))
+        draw.text((165, iy), it, font=get_font(False, 26), fill=(203, 213, 225))
 
-    draw.line([(140, box_y + 355), (WIDTH - 140, box_y + 355)], fill=(60, 123, 196), width=2)
-    f_sub = get_font(False, 24)
-    draw.text((WIDTH // 2, box_y + 395), "Previsões diárias, radares e alertas da Defesa Civil", font=f_sub, fill=(203, 213, 225), anchor="mm")
+    draw.line([(140, box_y + 275), (WIDTH - 140, box_y + 275)], fill=(60, 123, 196), width=2)
+    draw.text((WIDTH // 2, box_y + 315), "Curta, compartilhe e fique por dentro do clima em Rio das Ostras!", font=get_font(True, 24), fill=(255, 186, 115), anchor="mm")
 
 def main():
     out_dir = "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/videos"
