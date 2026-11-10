@@ -13,19 +13,21 @@ import { StationLinksModal } from './components/StationLinksModal';
 import { StationsComparisonChart } from './components/StationsComparisonChart';
 import { TextReportSection } from './components/TextReportSection';
 import { DailyInfographicModal } from './components/DailyInfographicModal';
+import { MonthlyPanoramaModal } from './components/MonthlyPanoramaModal';
 import { Footer } from './components/Footer';
 import { 
   LayoutGrid, 
   Table, 
   MapPin, 
-  ShieldAlert,
-  Search,
-  Map as MapIcon,
-  RotateCcw,
-  BarChart3,
-  FileText,
-  Sparkles,
-  Download
+  ShieldAlert, 
+  Search, 
+  Map as MapIcon, 
+  RotateCcw, 
+  BarChart3, 
+  FileText, 
+  Sparkles, 
+  Download,
+  Film
 } from 'lucide-react';
 
 export function App() {
@@ -59,6 +61,7 @@ export function App() {
   const [isLinksModalOpen, setIsLinksModalOpen] = useState(false);
   const [embeddedStation, setEmbeddedStation] = useState(null);
   const [isInfographicModalOpen, setIsInfographicModalOpen] = useState(false);
+  const [isPanoramaModalOpen, setIsPanoramaModalOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
@@ -188,6 +191,7 @@ export function App() {
           onOpenLinksModal={() => setIsLinksModalOpen(true)}
           onOpenChartTab={() => setActiveTab('chart')}
           onOpenInfographicModal={() => setIsInfographicModalOpen(true)}
+          onOpenPanoramaModal={() => setIsPanoramaModalOpen(true)}
         />
 
         {/* Severe Weather Alert Notice Banner (if any) */}
@@ -211,34 +215,65 @@ export function App() {
           </div>
         )}
 
-        {/* Card Oficial Diário Quick Banner */}
-        <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 border border-sky-800/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-400 text-slate-950 flex items-center justify-center font-bold shadow-md shrink-0">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-bold text-sm sm:text-base text-white">
-                  Card Oficial de Acumulados de Chuva
-                </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">
-                  Estilo Infográfico Diário
-                </span>
+        {/* Quick Highlights Banners: Daily Card + October Panorama Video */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
+          {/* Card Oficial Diário */}
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 border border-sky-800/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-cyan-400 text-slate-950 flex items-center justify-center font-bold shadow-md shrink-0">
+                <Sparkles className="w-5 h-5 text-white" />
               </div>
-              <p className="text-xs text-slate-300">
-                Gere e baixe a imagem em alta resolução com os acumulados do dia para postar no WhatsApp e redes sociais.
-              </p>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-bold text-sm sm:text-base text-white">
+                    Card Oficial Diário
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">
+                    Infográfico
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 line-clamp-1 sm:line-clamp-none">
+                  Gere a imagem com os acumulados do dia para WhatsApp e redes.
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => setIsInfographicModalOpen(true)}
-              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-bold shadow-md transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5"
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-cyan-500 hover:from-sky-500 hover:to-cyan-400 text-white text-xs font-bold shadow-md transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Gerar & Baixar Card</span>
+              <span>Gerar Card</span>
+            </button>
+          </div>
+
+          {/* Vídeo Panorama Mensal (Outubro/2026) */}
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 border border-indigo-800/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center font-bold shadow-md shrink-0">
+                <Film className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-bold text-sm sm:text-base text-white">
+                    Vídeo Panorama • Outubro/2026
+                  </h3>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-800">
+                    FullHD Reels & 16:9
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 line-clamp-1 sm:line-clamp-none">
+                  Retrospectiva animada das estações, chuva e vento para @tempoemriodasostras.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsPanoramaModalOpen(true)}
+              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-xs font-bold shadow-md transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
+            >
+              <Film className="w-3.5 h-3.5" />
+              <span>Ver & Baixar Vídeo</span>
             </button>
           </div>
         </div>
@@ -510,6 +545,12 @@ export function App() {
           stations={stations}
           weatherData={weatherData}
           lastUpdated={lastUpdated}
+        />
+
+        {/* Monthly Retrospective Panorama Video Modal */}
+        <MonthlyPanoramaModal 
+          isOpen={isPanoramaModalOpen}
+          onClose={() => setIsPanoramaModalOpen(false)}
         />
 
         {/* Add Station Modal */}

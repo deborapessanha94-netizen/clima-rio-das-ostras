@@ -10,7 +10,8 @@ import {
   PlusCircle,
   Link2,
   BarChart3,
-  Sparkles
+  Sparkles,
+  Film
 } from 'lucide-react';
 
 export function Header({ 
@@ -27,7 +28,8 @@ export function Header({
   onOpenBulletinsModal,
   onOpenLinksModal,
   onOpenChartTab,
-  onOpenInfographicModal
+  onOpenInfographicModal,
+  onOpenPanoramaModal
 }) {
   const activeStations = stations.filter(s => weatherData[s.id]?.status !== 'offline');
   const validWeathers = activeStations.map(s => weatherData[s.id]?.current).filter(Boolean);
@@ -80,6 +82,19 @@ export function Header({
 
         {/* Unified Action Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
+          {/* Vídeo Panorama Mensal (Outubro/2026) */}
+          {onOpenPanoramaModal && (
+            <button
+              onClick={onOpenPanoramaModal}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 transition shadow-xs cursor-pointer active:scale-95"
+              title="Assistir e baixar o Vídeo Retrospectiva do Mês de Outubro/2026"
+            >
+              <Film className="w-3.5 h-3.5 text-pink-200" />
+              <span className="hidden xs:inline">Vídeo Outubro</span>
+              <span className="xs:hidden">Vídeo</span>
+            </button>
+          )}
+
           {/* Card Oficial Diário (Infográfico) */}
           {onOpenInfographicModal && (
             <button
