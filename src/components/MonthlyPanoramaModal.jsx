@@ -59,8 +59,8 @@ Confira como o clima se comportou em nosso município ao longo dos 31 dias de Ou
 
 Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar o clima em Rio das Ostras!
 
+📍 Fontes: Estações Meteorológicas do Município
 👉 Siga @tempoemriodasostras para alertas, radares e monitoramento em tempo real.
-Acesse o painel completo: https://clima-rio-das-ostras.vercel.app
 
 #RioDasOstras #ClimaRioDasOstras #TempoEmRioDasOstras #Chuva #Meteorologia #Outubro2026 #DefesaCivil #RegiaoDosLagos #PrevisaoDoTempo`;
 

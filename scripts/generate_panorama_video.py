@@ -126,8 +126,8 @@ def render_frame(frame_idx):
         render_scene_6(draw, frame_img, frame_idx - 830)
 
     # Bottom watermark footer
-    f_foot = get_font(False, 22)
-    draw.text((WIDTH // 2, HEIGHT - 55), "clima-rio-das-ostras.vercel.app  •  Fontes: WU / INEA / CEMADEN", font=f_foot, fill=(148, 163, 184, 180), anchor="mm")
+    f_foot = get_font(False, 24)
+    draw.text((WIDTH // 2, HEIGHT - 55), "Fontes: Estações Meteorológicas do Município", font=f_foot, fill=(148, 163, 184, 190), anchor="mm")
 
     return cv2.cvtColor(np.array(frame_img), cv2.COLOR_RGBA2BGR)
 
@@ -514,10 +514,10 @@ def render_scene_6(draw, frame_img, rel_frame):
     # X
     draw.text((WIDTH // 2, box_y + 305), "✖️ X (Twitter): @tempoemro", font=f_handle, fill=(241, 245, 249), anchor="mm")
 
-    # Web Link
+    # Sources line
     draw.line([(120, box_y + 360), (WIDTH - 120, box_y + 360)], fill=(56, 189, 248, 80), width=2)
-    f_web = get_font(True, 30)
-    draw.text((WIDTH // 2, box_y + 400), "🌐 Acesse: clima-rio-das-ostras.vercel.app", font=f_web, fill=(56, 189, 248), anchor="mm")
+    f_web = get_font(True, 28)
+    draw.text((WIDTH // 2, box_y + 400), "Fontes: Estações Meteorológicas do Município", font=f_web, fill=(56, 189, 248), anchor="mm")
 
 def main():
     out_dir = "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/videos"

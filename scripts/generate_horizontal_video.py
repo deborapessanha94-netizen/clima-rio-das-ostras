@@ -107,8 +107,8 @@ def render_frame(frame_idx):
     else:
         render_scene_6(draw, frame_img, frame_idx - 830)
 
-    f_foot = get_font(False, 20)
-    draw.text((WIDTH // 2, HEIGHT - 35), "clima-rio-das-ostras.vercel.app  •  Fontes: WU / INEA / CEMADEN", font=f_foot, fill=(148, 163, 184, 180), anchor="mm")
+    f_foot = get_font(False, 22)
+    draw.text((WIDTH // 2, HEIGHT - 35), "Fontes: Estações Meteorológicas do Município", font=f_foot, fill=(148, 163, 184, 190), anchor="mm")
 
     return cv2.cvtColor(np.array(frame_img), cv2.COLOR_RGBA2BGR)
 
