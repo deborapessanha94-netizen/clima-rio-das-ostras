@@ -2,12 +2,14 @@ import os
 import math
 import cv2
 import numpy as np
+import subprocess
+import imageio_ffmpeg
 from PIL import Image, ImageDraw, ImageFont
 
 WIDTH = 1080
 HEIGHT = 1920
 FPS = 30
-TOTAL_SECONDS = 31
+TOTAL_SECONDS = 62
 TOTAL_FRAMES = FPS * TOTAL_SECONDS
 
 FONT_REGULAR = "C:/Windows/Fonts/segoeui.ttf"
@@ -104,26 +106,26 @@ def render_frame(frame_idx):
     # Top persistent header
     draw_header_bar(draw, frame_idx)
 
-    # SCENE TIMELINE
-    # S1: 0 - 140 (0s - 4.6s) -> Abertura
-    # S2: 140 - 320 (4.6s - 10.6s) -> Volume e Frequência de Chuva
-    # S3: 320 - 540 (10.6s - 18.0s) -> Ranking por Estação
-    # S4: 540 - 710 (18.0s - 23.6s) -> Ventos & Temperaturas
-    # S5: 710 - 830 (23.6s - 27.6s) -> Sistemas Meteorológicos
-    # S6: 830 - 930 (27.6s - 31.0s) -> Encerramento Oficial com Logo e Redes
+    # SCENE TIMELINE (SYNCHRONIZED WITH USER NARRATION)
+    # S1: 0 - 198 (0.0s - 6.6s) -> Abertura Oficial (Áudio: 0.25s - 6.35s)
+    # S2: 198 - 567 (6.6s - 18.9s) -> Volume e Frequência de Chuva (Áudio: 6.80s - 18.60s)
+    # S3: 567 - 1023 (18.9s - 34.1s) -> Ranking por Estação (Áudio: 19.10s - 33.80s)
+    # S4: 1023 - 1398 (34.1s - 46.6s) -> Ventos & Temperaturas (Áudio: 34.30s - 46.28s)
+    # S5: 1398 - 1608 (46.6s - 53.6s) -> Sistemas Meteorológicos (Áudio: 46.80s - 53.30s)
+    # S6: 1608 - 1860 (53.6s - 62.0s) -> Encerramento Oficial com Logo e Redes (Áudio: 53.80s - 61.10s)
 
-    if frame_idx < 140:
+    if frame_idx < 198:
         render_scene_1(draw, frame_img, frame_idx)
-    elif frame_idx < 320:
-        render_scene_2(draw, frame_img, frame_idx - 140)
-    elif frame_idx < 540:
-        render_scene_3(draw, frame_img, frame_idx - 320)
-    elif frame_idx < 710:
-        render_scene_4(draw, frame_img, frame_idx - 540)
-    elif frame_idx < 830:
-        render_scene_5(draw, frame_img, frame_idx - 710)
+    elif frame_idx < 567:
+        render_scene_2(draw, frame_img, frame_idx - 198)
+    elif frame_idx < 1023:
+        render_scene_3(draw, frame_img, frame_idx - 567)
+    elif frame_idx < 1398:
+        render_scene_4(draw, frame_img, frame_idx - 1023)
+    elif frame_idx < 1608:
+        render_scene_5(draw, frame_img, frame_idx - 1398)
     else:
-        render_scene_6(draw, frame_img, frame_idx - 830)
+        render_scene_6(draw, frame_img, frame_idx - 1608)
 
     # Bottom watermark footer
     f_foot = get_font(False, 24)
@@ -456,13 +458,15 @@ def render_scene_6(draw, frame_img, rel_frame):
 def main():
     out_dir = "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/videos"
     os.makedirs(out_dir, exist_ok=True)
+    temp_raw = os.path.join(out_dir, "temp_reels_raw.mp4")
     out_path = os.path.join(out_dir, "panorama_outubro_2026_reels.mp4")
+    audio_path = "C:/Users/debor/.gemini/antigravity/scratch/master_voice_norm.wav"
 
-    print(f"Generating video: {out_path}")
+    print(f"Generating video frames: {temp_raw}")
     print(f"Total frames: {TOTAL_FRAMES} at {FPS} FPS ({TOTAL_SECONDS}s)")
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    writer = cv2.VideoWriter(out_path, fourcc, FPS, (WIDTH, HEIGHT))
+    writer = cv2.VideoWriter(temp_raw, fourcc, FPS, (WIDTH, HEIGHT))
 
     if not writer.isOpened():
         print("ERROR: Could not open VideoWriter!")
@@ -471,12 +475,30 @@ def main():
     for f_idx in range(TOTAL_FRAMES):
         frame = render_frame(f_idx)
         writer.write(frame)
-        if f_idx % 60 == 0:
+        if f_idx % 120 == 0:
             print(f"Rendered {f_idx}/{TOTAL_FRAMES} frames ({(f_idx/TOTAL_FRAMES)*100:.1f}%)")
 
     writer.release()
-    print("DONE! File created:", out_path)
-    print("File size:", os.path.getsize(out_path), "bytes")
+    print("Video stream rendered. Now muxing audio with FFmpeg (H.264 + AAC)...")
+
+    ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
+    cmd = [
+        ffmpeg, "-y",
+        "-i", temp_raw,
+        "-i", audio_path,
+        "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p",
+        "-c:a", "aac", "-b:a", "192k",
+        "-shortest",
+        out_path
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode == 0:
+        print("DONE! Master Reels video created:", out_path)
+        print("File size:", os.path.getsize(out_path), "bytes")
+        if os.path.exists(temp_raw):
+            os.remove(temp_raw)
+    else:
+        print("FFmpeg error:", res.stderr)
 
 if __name__ == "__main__":
     main()
