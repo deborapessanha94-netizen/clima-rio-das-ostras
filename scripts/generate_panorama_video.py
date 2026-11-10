@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 WIDTH = 1080
 HEIGHT = 1920
 FPS = 30
-TOTAL_SECONDS = 62
+TOTAL_SECONDS = 66
 TOTAL_FRAMES = FPS * TOTAL_SECONDS
 
 FONT_REGULAR = "C:/Windows/Fonts/segoeui.ttf"
@@ -106,26 +106,26 @@ def render_frame(frame_idx):
     # Top persistent header
     draw_header_bar(draw, frame_idx)
 
-    # SCENE TIMELINE (SYNCHRONIZED WITH USER NARRATION)
-    # S1: 0 - 198 (0.0s - 6.6s) -> Abertura Oficial (Áudio: 0.25s - 6.35s)
-    # S2: 198 - 567 (6.6s - 18.9s) -> Volume e Frequência de Chuva (Áudio: 6.80s - 18.60s)
-    # S3: 567 - 1023 (18.9s - 34.1s) -> Ranking por Estação (Áudio: 19.10s - 33.80s)
-    # S4: 1023 - 1398 (34.1s - 46.6s) -> Ventos & Temperaturas (Áudio: 34.30s - 46.28s)
-    # S5: 1398 - 1608 (46.6s - 53.6s) -> Sistemas Meteorológicos (Áudio: 46.80s - 53.30s)
-    # S6: 1608 - 1860 (53.6s - 62.0s) -> Encerramento Oficial com Logo e Redes (Áudio: 53.80s - 61.10s)
+    # SCENE TIMELINE (SYNCHRONIZED WITH 100% AI NEURAL LOCUTORA)
+    # S1: 0 - 276 (0.0s - 9.2s) -> Abertura Oficial (Áudio: 0.30s - 9.04s)
+    # S2: 276 - 648 (9.2s - 21.6s) -> Volume e Frequência de Chuva (Áudio: 9.40s - 21.40s)
+    # S3: 648 - 1032 (21.6s - 34.4s) -> Ranking por Estação (Áudio: 21.80s - 34.23s)
+    # S4: 1032 - 1446 (34.4s - 48.2s) -> Ventos & Temperaturas (Áudio: 34.60s - 48.02s)
+    # S5: 1446 - 1710 (48.2s - 57.0s) -> Sistemas Meteorológicos (Áudio: 48.40s - 56.75s)
+    # S6: 1710 - 1980 (57.0s - 66.0s) -> Encerramento Oficial com Logo e Redes (Áudio: 57.20s - 65.19s)
 
-    if frame_idx < 198:
+    if frame_idx < 276:
         render_scene_1(draw, frame_img, frame_idx)
-    elif frame_idx < 567:
-        render_scene_2(draw, frame_img, frame_idx - 198)
-    elif frame_idx < 1023:
-        render_scene_3(draw, frame_img, frame_idx - 567)
-    elif frame_idx < 1398:
-        render_scene_4(draw, frame_img, frame_idx - 1023)
-    elif frame_idx < 1608:
-        render_scene_5(draw, frame_img, frame_idx - 1398)
+    elif frame_idx < 648:
+        render_scene_2(draw, frame_img, frame_idx - 276)
+    elif frame_idx < 1032:
+        render_scene_3(draw, frame_img, frame_idx - 648)
+    elif frame_idx < 1446:
+        render_scene_4(draw, frame_img, frame_idx - 1032)
+    elif frame_idx < 1710:
+        render_scene_5(draw, frame_img, frame_idx - 1446)
     else:
-        render_scene_6(draw, frame_img, frame_idx - 1608)
+        render_scene_6(draw, frame_img, frame_idx - 1710)
 
     # Bottom watermark footer
     f_foot = get_font(False, 24)
@@ -458,7 +458,7 @@ def render_scene_6(draw, frame_img, rel_frame):
 def main():
     out_dir = "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/videos"
     os.makedirs(out_dir, exist_ok=True)
-    temp_raw = os.path.join(out_dir, "temp_reels_raw.mp4")
+    temp_raw = os.path.join(out_dir, "temp_reels_ai_raw.mp4")
     out_path = os.path.join(out_dir, "panorama_outubro_2026_reels.mp4")
     audio_path = "C:/Users/debor/.gemini/antigravity/scratch/master_voice_norm.wav"
 
