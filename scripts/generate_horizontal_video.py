@@ -267,9 +267,9 @@ def render_scene_3(draw, frame_img, rel_frame):
         val_display = round(st["val"] * eased, 1)
         draw.text((bar_x + bar_max_w + 35, row_y + 47), f"{val_display:.1f} mm", font=get_font(True, 34), fill=(255, 255, 255), anchor="lm")
 
-    j_y = start_y + 5 * row_height + 15
-    draw_rounded_rect(draw, (100, j_y, WIDTH - 100, j_y + 115), fill=(16, 40, 50), outline=(16, 185, 129), radius=18, width=2)
-    draw.text((140, j_y + 57), "Rio Jundiá (INEA): Vigilância contínua de cota fluvial e calha estável ao longo do mês", font=get_font(True, 26), fill=(52, 211, 153), anchor="lm")
+    call_y = start_y + 5 * row_height + 20
+    draw_rounded_rect(draw, (100, call_y, WIDTH - 100, call_y + 90), fill=(15, 23, 42), outline=(56, 189, 248), radius=18, width=2)
+    draw.text((WIDTH // 2, call_y + 45), "Média consolidada na rede: 243,3 mm • Maior acumulado do ano registrado em Rocha Leão (410,0 mm)", font=get_font(True, 26), fill=(56, 189, 248), anchor="mm")
 
 # SCENE 4: VENTOS & TEMPERATURAS (Horizontal)
 def render_scene_4(draw, frame_img, rel_frame):

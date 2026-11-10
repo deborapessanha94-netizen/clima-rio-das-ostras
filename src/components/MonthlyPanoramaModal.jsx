@@ -40,7 +40,6 @@ Confira como o clima se comportou em nosso município ao longo dos 31 dias de Ou
 💨 Maior Rajada do Mês: 62,3 km/h na Praia da Tartaruga (26/10 às 10:00)
 🌬️ Vento Médio: 16,6 km/h • Direção Predominante: Nordeste (NE)
 🌡️ Temperaturas: Mínima de 18,4°C | Máxima de 32,6°C
-🌊 Rio Jundiá (INEA): Calha monitorada 24h sem extravasamento crítico
 
 📍 RANKING DOS ACUMULADOS POR BAIRRO/ESTAÇÃO:
 1️⃣ Rocha Leão: 410,0 mm
@@ -48,7 +47,6 @@ Confira como o clima se comportou em nosso município ao longo dos 31 dias de Ou
 3️⃣ Praiamar: 177,3 mm
 4️⃣ Praia da Tartaruga: 167,9 mm
 5️⃣ Costazul: 131,3 mm
-🌊 Rio Jundiá (INEA): Vigilância e cotas contínuas
 
 🌀 SISTEMAS METEOROLÓGICOS ATUANTES:
 • ASAS (Alta Subtropical do Atlântico Sul): 12 dias
@@ -261,12 +259,9 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
                   <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">5️⃣ Costazul</span>
                   <span className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400">131,3 mm</span>
                 </div>
-                <div className="flex items-center justify-between p-2 rounded-lg bg-cyan-50/70 dark:bg-cyan-950/30 border border-cyan-200/50 dark:border-cyan-800/40">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
-                    <Waves className="w-3.5 h-3.5 text-cyan-600" />
-                    Rio Jundiá (INEA)
-                  </span>
-                  <span className="text-[11px] font-semibold text-cyan-700 dark:text-cyan-300">Vigilância Contínua</span>
+                <div className="flex items-center justify-between p-2 rounded-lg bg-sky-50/50 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-800/30">
+                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">📊 Média Geral da Rede</span>
+                  <span className="text-xs font-bold font-mono text-sky-700 dark:text-sky-300">243,3 mm</span>
                 </div>
               </div>
             </div>

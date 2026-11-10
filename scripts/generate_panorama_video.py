@@ -311,10 +311,10 @@ def render_scene_3(draw, frame_img, rel_frame):
         f_val = get_font(True, 36)
         draw.text((box_x + box_w - 30, bar_y + 12), f"{curr_val} mm", font=f_val, fill=(255, 255, 255), anchor="rm")
 
-    call_y = 1250
-    draw_rounded_rect(draw, (60, call_y, WIDTH - 60, call_y + 150), fill=(15, 23, 42), outline=(0, 229, 255), radius=22, width=2)
-    draw.text((WIDTH // 2, call_y + 40), "MONITORAMENTO DO RIO JUNDIÁ (INEA)", font=get_font(True, 28), fill=(0, 229, 255), anchor="mm")
-    draw.text((WIDTH // 2, call_y + 85), "Cotas horárias sob vigilância contínua • Calha estável no mês", font=get_font(False, 24), fill=(203, 213, 225), anchor="mm")
+    call_y = 1260
+    draw_rounded_rect(draw, (60, call_y, WIDTH - 60, call_y + 130), fill=(15, 23, 42), outline=(56, 189, 248), radius=22, width=2)
+    draw.text((WIDTH // 2, call_y + 40), "PRECIPITAÇÃO CONSOLIDADA NO MÊS", font=get_font(True, 28), fill=(56, 189, 248), anchor="mm")
+    draw.text((WIDTH // 2, call_y + 80), "Média na rede: 243,3 mm • Maior acumulado do ano em Rocha Leão", font=get_font(False, 24), fill=(203, 213, 225), anchor="mm")
 
 # SCENE 4: VENTOS, RAJADAS E TEMPERATURAS - ZERO OVERLAPS
 def render_scene_4(draw, frame_img, rel_frame):
