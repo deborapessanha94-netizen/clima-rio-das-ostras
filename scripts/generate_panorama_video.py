@@ -586,7 +586,6 @@ def main():
     os.makedirs(out_dir, exist_ok=True)
     temp_raw = os.path.join(out_dir, "temp_reels_silent_raw.mp4")
     out_path = os.path.join(out_dir, "panorama_outubro_2026_reels.mp4")
-    soundtrack_path = "C:/Users/debor/.gemini/antigravity/scratch/ambient_soundtrack.wav"
 
     print(f"Generating self-explanatory visual reels: {temp_raw}")
     print(f"Total frames: {TOTAL_FRAMES} at {FPS} FPS ({TOTAL_SECONDS}s)")
@@ -605,21 +604,19 @@ def main():
             print(f"Rendered {f_idx}/{TOTAL_FRAMES} frames ({(f_idx/TOTAL_FRAMES)*100:.1f}%)")
 
     writer.release()
-    print("Video stream rendered. Now muxing with subtle ambient soundtrack (H.264 + AAC)...")
+    print("Video stream rendered. Encoding silent Reels video with H.264 (-an)...")
 
     ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
     cmd = [
         ffmpeg, "-y",
         "-i", temp_raw,
-        "-i", soundtrack_path,
         "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p",
-        "-c:a", "aac", "-b:a", "128k",
-        "-shortest",
+        "-an",
         out_path
     ]
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode == 0:
-        print("DONE! Master Reels video created:", out_path)
+        print("DONE! Master Silent Reels video created:", out_path)
         print("File size:", os.path.getsize(out_path), "bytes")
         if os.path.exists(temp_raw):
             os.remove(temp_raw)
