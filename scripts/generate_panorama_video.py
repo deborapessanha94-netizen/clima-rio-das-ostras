@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 WIDTH = 1080
 HEIGHT = 1920
 FPS = 30
-TOTAL_SECONDS = 44
+TOTAL_SECONDS = 47
 TOTAL_FRAMES = FPS * TOTAL_SECONDS
 
 FONT_REGULAR = "C:/Windows/Fonts/segoeui.ttf"
@@ -90,12 +90,12 @@ def draw_header_bar(draw, frame_idx, current_scene_idx):
     # Divider
     draw.line([(60, top_y + 60), (WIDTH - 60, top_y + 60)], fill=COLOR_BLUE, width=1)
 
-    # 5 STORIES STEPS INDICATOR
+    # 6 STORIES STEPS INDICATOR
     step_y = top_y + 72
-    total_steps = 5
+    total_steps = 6
     margin = 60
     avail_w = WIDTH - 2 * margin
-    step_gap = 14
+    step_gap = 12
     step_w = (avail_w - (total_steps - 1) * step_gap) / total_steps
     step_h = 6
 
@@ -121,33 +121,38 @@ def render_frame(frame_idx):
         p_al = int(particle_alpha[i] * (0.6 + 0.4 * math.sin(frame_idx * 0.05 + i)))
         draw.ellipse([px, py, px + p_sz, py + p_sz], fill=(COLOR_BLUE[0], COLOR_BLUE[1], COLOR_BLUE[2], p_al))
 
-    # SCENE TIMELINE (TOTAL 44 SECONDS = 1320 FRAMES)
-    # S1: 0 - 240 (0.0s - 8.0s) -> Abertura & 3 Grandes Números
-    # S2: 240 - 510 (8.0s - 17.0s) -> Resumo da Chuva e Dia Crítico
-    # S3: 510 - 810 (17.0s - 27.0s) -> Ranking Direto das 5 Estações
-    # S4: 810 - 1080 (27.0s - 36.0s) -> Ventos e Extremos Térmicos
-    # S5: 1080 - 1320 (36.0s - 44.0s) -> Sistemas & Card Final
+    # SCENE TIMELINE (TOTAL 47 SECONDS = 1410 FRAMES)
+    # S1: 0 - 180 (0.0s - 6.0s) -> Abertura & 3 Números Chave
+    # S2: 180 - 420 (6.0s - 14.0s) -> Volume Total de Chuva (Sem médias confusas)
+    # S3: 420 - 690 (14.0s - 23.0s) -> Ranking Total das 5 Estações
+    # S4: 690 - 930 (23.0s - 31.0s) -> Ventos e Variação Térmica
+    # S5: 930 - 1170 (31.0s - 39.0s) -> O Que Comandou o Tempo (Sistemas Atmosféricos)
+    # S6: 1170 - 1410 (39.0s - 47.0s) -> Divulgação Oficial & Siga o Canal (Dedicada)
 
-    if frame_idx < 240:
+    if frame_idx < 180:
         current_scene = 0
         draw_header_bar(draw, frame_idx, current_scene)
         render_scene_1(draw, frame_img, frame_idx)
-    elif frame_idx < 510:
+    elif frame_idx < 420:
         current_scene = 1
         draw_header_bar(draw, frame_idx, current_scene)
-        render_scene_2(draw, frame_img, frame_idx - 240)
-    elif frame_idx < 810:
+        render_scene_2(draw, frame_img, frame_idx - 180)
+    elif frame_idx < 690:
         current_scene = 2
         draw_header_bar(draw, frame_idx, current_scene)
-        render_scene_3(draw, frame_img, frame_idx - 510)
-    elif frame_idx < 1080:
+        render_scene_3(draw, frame_img, frame_idx - 420)
+    elif frame_idx < 930:
         current_scene = 3
         draw_header_bar(draw, frame_idx, current_scene)
-        render_scene_4(draw, frame_img, frame_idx - 810)
-    else:
+        render_scene_4(draw, frame_img, frame_idx - 690)
+    elif frame_idx < 1170:
         current_scene = 4
         draw_header_bar(draw, frame_idx, current_scene)
-        render_scene_5(draw, frame_img, frame_idx - 1080)
+        render_scene_5(draw, frame_img, frame_idx - 930)
+    else:
+        current_scene = 5
+        draw_header_bar(draw, frame_idx, current_scene)
+        render_scene_6(draw, frame_img, frame_idx - 1170)
 
     # Bottom watermark footer (STRICTLY REQUIRED: No website URL)
     f_foot = get_font(False, 24)
@@ -155,9 +160,9 @@ def render_frame(frame_idx):
 
     return cv2.cvtColor(np.array(frame_img), cv2.COLOR_RGBA2BGR)
 
-# SCENE 1: ABERTURA COM IMPACTO E OS 3 NÚMEROS CHAVE (8s)
+# SCENE 1: ABERTURA COM IMPACTO E OS 3 NÚMEROS CHAVE (6s)
 def render_scene_1(draw, frame_img, rel_frame):
-    progress = min(1.0, rel_frame / 25.0)
+    progress = min(1.0, rel_frame / 20.0)
     eased = 1.0 - math.pow(1.0 - progress, 3)
 
     # Logo institucional centralizado
@@ -191,22 +196,19 @@ def render_scene_1(draw, frame_img, rel_frame):
     draw.text((WIDTH // 2, box_y + 225), "OUTUBRO 2026", font=get_font(True, 84), fill=COLOR_ORANGE, anchor="mm")
     draw.text((WIDTH // 2, box_y + 310), "RIO DAS OSTRAS • RJ", font=get_font(True, 28), fill=COLOR_MUTED, anchor="mm")
 
-    # 3 Hero Metric Cards (Instant scannability)
+    # 3 Hero Metric Cards (Foco nos dados totais da população)
     card_y = 920
     card_h = 220
     card_w = 960
     c_x = (WIDTH - card_w) // 2
 
     metrics = [
-        ("243,3 mm", "CHUVA MÉDIA DA REDE", "Volume 168% acima da normal histórica", COLOR_BLUE),
-        ("25 DIAS", "FREQUÊNCIA DE CHUVA", "Choveu em 80% dos dias do mês", COLOR_ORANGE),
+        ("410,0 mm", "RECORDE TOTAL DE CHUVA", "Pico histórico registrado na estação Rocha Leão", COLOR_ORANGE),
+        ("25 DIAS", "DIAS COM CHUVA NA CIDADE", "Choveu em 80% dos dias do mês no município", COLOR_BLUE),
         ("62,3 km/h", "MAIOR RAJADA DE VENTO", "Praia da Tartaruga (26/10 às 10h)", COLOR_BLUE)
     ]
 
     for m_i, (hero_val, label, sublabel, border_c) in enumerate(metrics):
-        m_progress = min(1.0, max(0.0, (rel_frame - m_i * 6) / 25.0))
-        m_eased = 1.0 - math.pow(1.0 - m_progress, 3)
-
         cy = card_y + m_i * (card_h + 24)
         draw_rounded_rect(draw, (c_x, cy, c_x + card_w, cy + card_h), fill=COLOR_NAVY, outline=border_c, radius=24, width=2)
 
@@ -217,46 +219,46 @@ def render_scene_1(draw, frame_img, rel_frame):
         draw.text((c_x + 35, cy + 125), hero_val, font=get_font(True, 68), fill=COLOR_WHITE, anchor="lm")
         draw.text((c_x + 35, cy + 180), sublabel, font=get_font(False, 22), fill=COLOR_MUTED, anchor="lm")
 
-    # Prompt
-    draw.text((WIDTH // 2, 1720), "Veja os recordes e detalhes a seguir", font=get_font(True, 24), fill=COLOR_BLUE, anchor="mm")
+    draw.text((WIDTH // 2, 1720), "Veja os acumulados e detalhes a seguir", font=get_font(True, 24), fill=COLOR_BLUE, anchor="mm")
 
-# SCENE 2: RESUMO DA CHUVA (9s)
+# SCENE 2: VOLUME TOTAL DE CHUVA NO MUNICÍPIO (8s)
+# Foco 100% no volume real que choveu para a população, sem valores médios confusos!
 def render_scene_2(draw, frame_img, rel_frame):
-    draw.text((WIDTH // 2, 160), "VOLUME & FREQUÊNCIA", font=get_font(True, 50), fill=COLOR_WHITE, anchor="mm")
-    draw.text((WIDTH // 2, 215), "Outubro de 2026 foi um dos meses mais chuvosos da década", font=get_font(False, 24), fill=COLOR_MUTED, anchor="mm")
+    draw.text((WIDTH // 2, 160), "VOLUME TOTAL DE CHUVA", font=get_font(True, 50), fill=COLOR_WHITE, anchor="mm")
+    draw.text((WIDTH // 2, 215), "Quanto realmente choveu em Rio das Ostras ao longo de Outubro", font=get_font(False, 24), fill=COLOR_MUTED, anchor="mm")
 
-    progress = min(1.0, rel_frame / 35.0)
+    progress = min(1.0, rel_frame / 30.0)
     eased = 1.0 - math.pow(1.0 - progress, 3)
 
     card_w = 960
     c_x = (WIDTH - card_w) // 2
 
-    # CARD 1: VOLUME MÉDIO
+    # CARD 1: VOLUME TOTAL ACUMULADO
     c1_y = 260
     draw_rounded_rect(draw, (c_x, c1_y, c_x + card_w, c1_y + 420), fill=COLOR_NAVY, outline=COLOR_ORANGE, radius=28, width=3)
     
-    draw_rounded_rect(draw, (c_x + 40, c1_y + 30, c_x + 360, c1_y + 75), fill=(45, 28, 18), outline=COLOR_ORANGE, radius=14, width=2)
-    draw.text((c_x + 200, c1_y + 52), "ACUMULADO MÉDIO", font=get_font(True, 22), fill=COLOR_ORANGE, anchor="mm")
+    draw_rounded_rect(draw, (c_x + 40, c1_y + 30, c_x + 380, c1_y + 75), fill=(45, 28, 18), outline=COLOR_ORANGE, radius=14, width=2)
+    draw.text((c_x + 210, c1_y + 52), "RECORDE TOTAL DO MÊS", font=get_font(True, 22), fill=COLOR_ORANGE, anchor="mm")
 
-    val_anim = round(243.3 * eased, 1)
+    val_anim = round(410.0 * eased, 1)
     str_val = f"{val_anim:.1f}".replace('.', ',')
     draw.text((c_x + 40, c1_y + 115), str_val, font=get_font(True, 108), fill=COLOR_WHITE)
     draw.text((c_x + 360, c1_y + 165), "mm", font=get_font(True, 50), fill=COLOR_ORANGE)
 
-    draw.text((c_x + 40, c1_y + 260), "Volume 168% acima do esperado para o mês", font=get_font(True, 28), fill=COLOR_WHITE)
-    draw.text((c_x + 40, c1_y + 320), "• Pico isolado de 410,0 mm registrados na estação Rocha Leão.", font=get_font(False, 24), fill=COLOR_MUTED)
-    draw.text((c_x + 40, c1_y + 365), "• Quase 3 vezes a precipitação normal observada na região.", font=get_font(False, 22), fill=COLOR_MUTED)
+    draw.text((c_x + 40, c1_y + 260), "Pico total registrado na estação Rocha Leão", font=get_font(True, 28), fill=COLOR_WHITE)
+    draw.text((c_x + 40, c1_y + 320), "• Acumulados no município variaram de 131,3 mm (orla) a 410,0 mm (interior).", font=get_font(False, 22), fill=COLOR_MUTED)
+    draw.text((c_x + 40, c1_y + 365), "• Foi o mês mais chuvoso do ano em todas as estações municipais.", font=get_font(False, 22), fill=COLOR_MUTED)
 
     # CARD 2: DIAS COM CHUVA
     c2_y = 720
     draw_rounded_rect(draw, (c_x, c2_y, c_x + card_w, c2_y + 430), fill=COLOR_NAVY, outline=COLOR_BLUE, radius=28, width=2)
 
-    draw_rounded_rect(draw, (c_x + 40, c2_y + 30, c_x + 360, c2_y + 75), fill=COLOR_SUB_BG, outline=COLOR_BLUE, radius=14, width=2)
-    draw.text((c_x + 200, c2_y + 52), "CONSTÂNCIA HISTÓRICA", font=get_font(True, 22), fill=COLOR_BLUE, anchor="mm")
+    draw_rounded_rect(draw, (c_x + 40, c2_y + 30, c_x + 380, c2_y + 75), fill=COLOR_SUB_BG, outline=COLOR_BLUE, radius=14, width=2)
+    draw.text((c_x + 210, c2_y + 52), "DIAS COM CHUVA NA CIDADE", font=get_font(True, 22), fill=COLOR_BLUE, anchor="mm")
 
     dias_anim = int(25 * eased)
     draw.text((c_x + 40, c2_y + 115), f"{dias_anim} DIAS", font=get_font(True, 96), fill=COLOR_WHITE)
-    draw.text((c_x + 40, c2_y + 235), "Choveu em 8 de cada 10 dias (80% do mês)", font=get_font(True, 28), fill=COLOR_BLUE)
+    draw.text((c_x + 40, c2_y + 235), "Choveu em 8 de cada 10 dias em Rio das Ostras", font=get_font(True, 28), fill=COLOR_BLUE)
 
     bar_y = c2_y + 295
     bar_w = card_w - 80
@@ -265,23 +267,23 @@ def render_scene_2(draw, frame_img, rel_frame):
     if fill_w > 15:
         draw_rounded_rect(draw, (c_x + 40, bar_y, c_x + 40 + fill_w, bar_y + 26), fill=COLOR_BLUE, radius=13)
     
-    draw.text((c_x + 40, c2_y + 355), "• Solo continuamente saturado exigiu atenção das equipes de emergência.", font=get_font(False, 22), fill=COLOR_MUTED)
+    draw.text((c_x + 40, c2_y + 355), "• A frequência contínua manteve o solo encharcado durante quase todo o mês.", font=get_font(False, 22), fill=COLOR_MUTED)
 
     # CARD 3: O DIA MAIS CHUVOSO
     c3_y = 1190
     draw_rounded_rect(draw, (c_x, c3_y, c_x + card_w, c3_y + 440), fill=COLOR_NAVY, outline=COLOR_ORANGE, radius=28, width=2)
 
-    draw_rounded_rect(draw, (c_x + 40, c3_y + 30, c_x + 360, c3_y + 75), fill=(45, 28, 18), outline=COLOR_ORANGE, radius=14, width=2)
-    draw.text((c_x + 200, c3_y + 52), "DIA MAIS SEVERO", font=get_font(True, 22), fill=COLOR_ORANGE, anchor="mm")
+    draw_rounded_rect(draw, (c_x + 40, c3_y + 30, c_x + 380, c3_y + 75), fill=(45, 28, 18), outline=COLOR_ORANGE, radius=14, width=2)
+    draw.text((c_x + 210, c3_y + 52), "DIA MAIS CHUVOSO DO ANO", font=get_font(True, 22), fill=COLOR_ORANGE, anchor="mm")
 
     draw.text((c_x + 40, c3_y + 115), "02 / 10 / 2026", font=get_font(True, 68), fill=COLOR_WHITE)
-    draw.text((c_x + 40, c3_y + 205), "Média de 48,0 mm e pico de 84,3 mm em 24h", font=get_font(True, 28), fill=COLOR_ORANGE)
+    draw.text((c_x + 40, c3_y + 205), "Volume de até 84,3 mm em apenas 24 horas", font=get_font(True, 28), fill=COLOR_ORANGE)
 
     draw_rounded_rect(draw, (c_x + 40, c3_y + 265, c_x + card_w - 40, c3_y + 395), fill=COLOR_SUB_BG, outline=COLOR_BLUE, radius=16, width=1)
-    draw.text((c_x + 65, c3_y + 305), "• Causa: Avanço de frente fria costeira com cavado de baixa pressão.", font=get_font(False, 22), fill=COLOR_WHITE)
-    draw.text((c_x + 65, c3_y + 350), "• Maior volume concentrado do ano registrado em toda a região.", font=get_font(False, 21), fill=COLOR_MUTED)
+    draw.text((c_x + 65, c3_y + 305), "• Frente fria costeira provocou o evento de chuva mais concentrado de 2026.", font=get_font(False, 22), fill=COLOR_WHITE)
+    draw.text((c_x + 65, c3_y + 350), "• Vários bairros registraram acumulados acima de 50 mm no mesmo dia.", font=get_font(False, 21), fill=COLOR_MUTED)
 
-# SCENE 3: RANKING DAS 5 ESTAÇÕES (10s)
+# SCENE 3: RANKING DAS 5 ESTAÇÕES (9s)
 def render_scene_3(draw, frame_img, rel_frame):
     draw.text((WIDTH // 2, 160), "ONDE MAIS CHOVEU?", font=get_font(True, 50), fill=COLOR_WHITE, anchor="mm")
     draw.text((WIDTH // 2, 215), "Ranking total de chuva acumulada em Outubro de 2026", font=get_font(False, 24), fill=COLOR_MUTED, anchor="mm")
@@ -325,7 +327,6 @@ def render_scene_3(draw, frame_img, rel_frame):
         str_val = f"{cur_val:.1f}".replace('.', ',') + " mm"
         draw.text((WIDTH - 95, bar_y + 12), str_val, font=get_font(True, 36), fill=COLOR_WHITE, anchor="rm")
 
-        # Short 1-line detail
         draw.text((95, y + 142), f"• {st['sub']}", font=get_font(False, 22), fill=COLOR_MUTED)
 
     # Clean Takeaway
@@ -335,7 +336,7 @@ def render_scene_3(draw, frame_img, rel_frame):
     draw.text((WIDTH // 2, call_y + 85), "Rocha Leão (410 mm) acumulou mais que o triplo de Costazul (131 mm),", font=get_font(False, 22), fill=COLOR_WHITE, anchor="mm")
     draw.text((WIDTH // 2, call_y + 115), "comprovando a forte retenção de umidade na serra municipal.", font=get_font(False, 20), fill=COLOR_MUTED, anchor="mm")
 
-# SCENE 4: VENTOS & TEMPERATURAS (9s)
+# SCENE 4: VENTOS & TEMPERATURAS (8s)
 def render_scene_4(draw, frame_img, rel_frame):
     draw.text((WIDTH // 2, 160), "VENTOS & TEMPERATURAS", font=get_font(True, 50), fill=COLOR_WHITE, anchor="mm")
     draw.text((WIDTH // 2, 215), "Os extremos de rajadas e variação térmica registrados", font=get_font(False, 24), fill=COLOR_MUTED, anchor="mm")
@@ -346,7 +347,7 @@ def render_scene_4(draw, frame_img, rel_frame):
     card_w = 960
     c_x = (WIDTH - card_w) // 2
 
-    # CARD 1: MAIOR RAJADA (HERO NUMBER)
+    # CARD 1: MAIOR RAJADA
     c1_y = 260
     draw_rounded_rect(draw, (c_x, c1_y, c_x + card_w, c1_y + 480), fill=COLOR_NAVY, outline=COLOR_ORANGE, radius=28, width=3)
     
@@ -365,7 +366,7 @@ def render_scene_4(draw, frame_img, rel_frame):
     draw.text((c_x + 70, c1_y + 315), "• Velocidade média dos ventos: 16,6 km/h (Direção Nordeste dominante)", font=get_font(False, 22), fill=COLOR_WHITE)
     draw.text((c_x + 70, c1_y + 375), "• Mar agitado com ondas de até 2,5 metros nos dias de pico de vento.", font=get_font(False, 21), fill=COLOR_MUTED)
 
-    # CARD 2: EXTREMOS TÉRMICOS (MIN E MAX)
+    # CARD 2: EXTREMOS TÉRMICOS
     c2_y = 780
     draw_rounded_rect(draw, (c_x, c2_y, c_x + card_w, c2_y + 860), fill=COLOR_NAVY, outline=COLOR_BLUE, radius=28, width=2)
     draw.text((c_x + 40, c2_y + 45), "VARIAÇÃO TÉRMICA DO MÊS", font=get_font(True, 32), fill=COLOR_BLUE)
@@ -392,32 +393,72 @@ def render_scene_4(draw, frame_img, rel_frame):
     draw.text((c_x + 70, c2_y + 655), "a massa de ar quente continental e as incursões oceânicas polares.", font=get_font(False, 22), fill=COLOR_MUTED)
     draw.text((c_x + 70, c2_y + 720), "• Variação confortável que alternou dias de praia com noites amenas.", font=get_font(False, 22), fill=COLOR_BLUE)
 
-# SCENE 5: SISTEMAS & BRAND CARD (8s)
+# SCENE 5: O QUE COMANDOU O TEMPO? (8s)
+# 100% DEDICADA AOS SISTEMAS METEOROLÓGICOS (SEM MISTURAR COM DIVULGAÇÃO!)
 def render_scene_5(draw, frame_img, rel_frame):
-    draw.text((WIDTH // 2, 160), "O QUE COMANDOU O MÊS?", font=get_font(True, 48), fill=COLOR_WHITE, anchor="mm")
-    draw.text((WIDTH // 2, 215), "Balanço dos sistemas meteorológicos atuantes", font=get_font(False, 24), fill=COLOR_MUTED, anchor="mm")
+    draw.text((WIDTH // 2, 160), "O QUE COMANDOU O TEMPO?", font=get_font(True, 50), fill=COLOR_WHITE, anchor="mm")
+    draw.text((WIDTH // 2, 215), "Os 3 sistemas atmosféricos que ditaram o clima de Outubro/2026", font=get_font(False, 24), fill=COLOR_MUTED, anchor="mm")
 
     card_w = 960
     c_x = (WIDTH - card_w) // 2
 
-    # Box com os 3 principais sistemas
-    s_y = 265
-    s_h = 370
-    draw_rounded_rect(draw, (c_x, s_y, c_x + card_w, s_y + s_h), fill=COLOR_NAVY, outline=COLOR_BLUE, radius=28, width=2)
-    
     systems = [
-        ("12 DIAS", "Sol Forte & Calor (ASAS)", "Tempo firme e vento nordeste costeiro", COLOR_ORANGE),
-        ("12 DIAS", "Cavados Costeiros & Umidade", "Pancadas de chuva e céu encoberto", COLOR_BLUE),
-        ("04 DIAS", "Passagem de Frentes Frias", "Quedas térmicas e viradas de vento para sul", COLOR_ORANGE),
+        {
+            "days": "12 DIAS", 
+            "title": "Sol Forte & Calor (ASAS)", 
+            "desc": "A Alta Subtropical garantiu dias ensolarados, praia e vento nordeste.",
+            "impact": "Predomínio de tempo firme e calor constante na primeira quinzena.",
+            "color": COLOR_ORANGE
+        },
+        {
+            "days": "12 DIAS", 
+            "title": "Cavados & Canais de Umidade", 
+            "desc": "Áreas de baixa pressão trouxeram céu encoberto e chuvas contínuas.",
+            "impact": "Responsáveis pelos 25 dias chuvosos que encharcaram a cidade.",
+            "color": COLOR_BLUE
+        },
+        {
+            "days": "04 DIAS", 
+            "title": "Passagem de Frentes Frias", 
+            "desc": "Viradas bruscas de vento para o quadrante sul e quedas térmicas.",
+            "impact": "Provocaram o dia mais chuvoso (84,3 mm) e o pico de vento de 62,3 km/h.",
+            "color": COLOR_ORANGE
+        }
     ]
 
-    for idx, (days, title, desc, col) in enumerate(systems):
-        ry = s_y + 35 + idx * 105
-        draw_rounded_rect(draw, (c_x + 35, ry, c_x + 185, ry + 75), fill=COLOR_SUB_BG, outline=col, radius=14, width=2)
-        draw.text((c_x + 110, ry + 37), days, font=get_font(True, 24), fill=col, anchor="mm")
+    start_y = 270
+    card_h = 360
+
+    for idx, sys in enumerate(systems):
+        y = start_y + idx * (card_h + 30)
+        draw_rounded_rect(draw, (c_x, y, c_x + card_w, y + card_h), fill=COLOR_NAVY, outline=sys["color"], radius=28, width=2)
+
+        # Number badge
+        draw_rounded_rect(draw, (c_x + 35, y + 30, c_x + 230, y + 85), fill=COLOR_SUB_BG, outline=sys["color"], radius=14, width=2)
+        draw.text((c_x + 132, y + 57), sys["days"], font=get_font(True, 26), fill=sys["color"], anchor="mm")
+
+        draw.text((c_x + 260, y + 57), sys["title"], font=get_font(True, 32), fill=COLOR_WHITE, anchor="lm")
+
+        draw.text((c_x + 35, y + 135), sys["desc"], font=get_font(False, 23), fill=COLOR_MUTED)
         
-        draw.text((c_x + 215, ry + 22), title, font=get_font(True, 26), fill=COLOR_WHITE)
-        draw.text((c_x + 215, ry + 56), desc, font=get_font(False, 21), fill=COLOR_MUTED)
+        draw_rounded_rect(draw, (c_x + 35, y + 215, c_x + card_w - 35, y + 315), fill=COLOR_SUB_BG, outline=COLOR_BLUE, radius=16, width=1)
+        draw.text((c_x + 60, y + 265), f"• {sys['impact']}", font=get_font(False, 22), fill=COLOR_WHITE, anchor="lm")
+
+    # Resumo síntese no rodapé
+    sum_y = start_y + 3 * (card_h + 30) + 10
+    draw_rounded_rect(draw, (c_x, sum_y, c_x + card_w, sum_y + 140), fill=COLOR_NAVY, outline=COLOR_ORANGE, radius=24, width=2)
+    draw.text((WIDTH // 2, sum_y + 40), "SÍNTESE METEOROLÓGICA", font=get_font(True, 24), fill=COLOR_ORANGE, anchor="mm")
+    draw.text((WIDTH // 2, sum_y + 85), "O confronto frequente entre a massa de ar quente e as frentes oceânicas", font=get_font(False, 22), fill=COLOR_WHITE, anchor="mm")
+    draw.text((WIDTH // 2, sum_y + 115), "fez de Outubro de 2026 um dos meses mais chuvosos e dinâmicos dos últimos anos.", font=get_font(False, 20), fill=COLOR_MUTED, anchor="mm")
+
+# SCENE 6: DIVULGAÇÃO OFICIAL DO CANAL (8s)
+# 100% DEDICADA À PÁGINA E CHAMADA PARA SEGUIR (SEM MISTURA DE OUTROS DADOS!)
+def render_scene_6(draw, frame_img, rel_frame):
+    draw.text((WIDTH // 2, 160), "ACOMPANHE O CLIMA DIARIAMENTE", font=get_font(True, 50), fill=COLOR_WHITE, anchor="mm")
+    draw.text((WIDTH // 2, 215), "Previsões diárias, alertas oficiais e monitoramento em tempo real", font=get_font(False, 24), fill=COLOR_MUTED, anchor="mm")
+
+    card_w = 960
+    c_x = (WIDTH - card_w) // 2
 
     # Brand Full Card Oficial
     if full_card:
@@ -425,32 +466,35 @@ def render_scene_5(draw, frame_img, rel_frame):
         target_h = int(full_card.height * (target_w / full_card.width))
         c_resized = full_card.resize((target_w, target_h), Image.Resampling.LANCZOS)
         cx = (WIDTH - target_w) // 2
-        cy = 675
+        cy = 280
         
-        draw_rounded_rect(draw, (cx - 8, cy - 8, cx + target_w + 8, cy + target_h + 8), fill=COLOR_ORANGE, radius=28)
+        draw_rounded_rect(draw, (cx - 8, cy - 8, cx + target_w + 8, cy + target_h + 8), fill=COLOR_ORANGE, radius=32)
         frame_img.paste(c_resized, (cx, cy), c_resized)
         
-        cta_y = cy + target_h + 40
+        box_y = cy + target_h + 45
     else:
-        cta_y = 1100
+        box_y = 800
 
-    # Call to action card
-    cta_h = 420
-    draw_rounded_rect(draw, (c_x, cta_y, c_x + card_w, cta_y + cta_h), fill=COLOR_NAVY, outline=COLOR_BLUE, radius=28, width=2)
-    draw.text((WIDTH // 2, cta_y + 55), "MONITORAMENTO DIÁRIO DO CLIMA", font=get_font(True, 32), fill=COLOR_WHITE, anchor="mm")
-    
-    bullets = [
-        ("• Previsões Diárias:", "Atualizadas todas as manhãs com tendências locais."),
-        ("• Alertas Oficiais:", "Avisos de tempestades, rajadas e ressacas no mar."),
-        ("• Dados em Tempo Real:", "Chuva consolidada de todas as estações municipais.")
+    # Card com o que o canal oferece
+    box_h = 580
+    draw_rounded_rect(draw, (c_x, box_y, c_x + card_w, box_y + box_h), fill=COLOR_NAVY, outline=COLOR_BLUE, radius=28, width=2)
+    draw.text((WIDTH // 2, box_y + 60), "O QUE VOCÊ ENCONTRA NA NOSSA PÁGINA:", font=get_font(True, 32), fill=COLOR_WHITE, anchor="mm")
+
+    items = [
+        ("• Previsões Diárias:", "Publicadas todas as manhãs com mapas locais."),
+        ("• Alertas Oficiais:", "Avisos prévios de tempestades, ventos e ressacas."),
+        ("• Chuva em Tempo Real:", "Acumulados atualizados de todas as estações municipais."),
+        ("• Condições da Orla:", "Tábua de marés, temperatura da água e rajadas de vento.")
     ]
-    for b_i, (b_title, b_desc) in enumerate(bullets):
-        by = cta_y + 105 + b_i * 75
-        draw.text((c_x + 50, by + 25), b_title, font=get_font(True, 23), fill=COLOR_ORANGE, anchor="lm")
-        draw.text((c_x + 340, by + 25), b_desc, font=get_font(False, 21), fill=COLOR_WHITE, anchor="lm")
 
-    draw.line([(c_x + 50, cta_y + 335), (c_x + card_w - 50, cta_y + 335)], fill=COLOR_BLUE, width=2)
-    draw.text((WIDTH // 2, cta_y + 375), "Siga @tempoemriodasostras no Instagram e acompanhe!", font=get_font(True, 26), fill=COLOR_ORANGE, anchor="mm")
+    for i, (b_title, b_desc) in enumerate(items):
+        iy = box_y + 115 + i * 95
+        draw_rounded_rect(draw, (c_x + 35, iy, c_x + card_w - 35, iy + 78), fill=COLOR_SUB_BG, outline=COLOR_BLUE, radius=16, width=1)
+        draw.text((c_x + 55, iy + 39), b_title, font=get_font(True, 24), fill=COLOR_ORANGE, anchor="lm")
+        draw.text((c_x + 360, iy + 39), b_desc, font=get_font(False, 21), fill=COLOR_WHITE, anchor="lm")
+
+    draw.line([(c_x + 50, box_y + 510), (c_x + card_w - 50, box_y + 510)], fill=COLOR_BLUE, width=2)
+    draw.text((WIDTH // 2, box_y + 545), "Siga @tempoemriodasostras no Instagram e compartilhe!", font=get_font(True, 28), fill=COLOR_ORANGE, anchor="mm")
 
 def main():
     out_dir = "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/videos"
@@ -458,7 +502,7 @@ def main():
     temp_raw = os.path.join(out_dir, "temp_reels_silent_raw.mp4")
     out_path = os.path.join(out_dir, "panorama_outubro_2026_reels.mp4")
 
-    print(f"Generating concise high-impact visual reels: {temp_raw}")
+    print(f"Generating clean, separated 6-scene Reels: {temp_raw}")
     print(f"Total frames: {TOTAL_FRAMES} at {FPS} FPS ({TOTAL_SECONDS}s)")
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -487,7 +531,7 @@ def main():
     ]
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode == 0:
-        print("DONE! Concise Master Silent Reels video created:", out_path)
+        print("DONE! Final Master Reels video created:", out_path)
         print("File size:", os.path.getsize(out_path), "bytes")
         if os.path.exists(temp_raw):
             os.remove(temp_raw)
