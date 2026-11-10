@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont
 WIDTH = 1920
 HEIGHT = 1080
 FPS = 30
-TOTAL_SECONDS = 66
+TOTAL_SECONDS = 75
 TOTAL_FRAMES = FPS * TOTAL_SECONDS
 
 FONT_REGULAR = "C:/Windows/Fonts/segoeui.ttf"
@@ -94,26 +94,26 @@ def render_frame(frame_idx):
 
     draw_header_bar(draw)
 
-    # SCENE TIMELINE (SYNCHRONIZED WITH 100% AI NEURAL LOCUTORA)
-    # S1: 0 - 276 (0.0s - 9.2s) -> Abertura (Áudio: 0.30s - 9.04s)
-    # S2: 276 - 648 (9.2s - 21.6s) -> Volume & Frequência (Áudio: 9.40s - 21.40s)
-    # S3: 648 - 1032 (21.6s - 34.4s) -> Ranking por Estação (Áudio: 21.80s - 34.23s)
-    # S4: 1032 - 1446 (34.4s - 48.2s) -> Ventos & Temperaturas (Áudio: 34.60s - 48.02s)
-    # S5: 1446 - 1710 (48.2s - 57.0s) -> Sistemas Meteorológicos (Áudio: 48.40s - 56.75s)
-    # S6: 1710 - 1980 (57.0s - 66.0s) -> Encerramento Oficial (Áudio: 57.20s - 65.19s)
+    # SCENE TIMELINE (SYNCHRONIZED WITH THALITA MULTILINGUAL NATURAL HUMAN VOICE)
+    # S1: 0 - 321 (0.0s - 10.7s) -> Abertura (Áudio: 0.35s - 10.45s)
+    # S2: 321 - 669 (10.7s - 22.3s) -> Volume & Frequência (Áudio: 10.95s - 22.04s)
+    # S3: 669 - 1143 (22.3s - 38.1s) -> Ranking por Estação (Áudio: 22.55s - 37.77s)
+    # S4: 1143 - 1587 (38.1s - 52.9s) -> Ventos & Temperaturas (Áudio: 38.35s - 52.58s)
+    # S5: 1587 - 1926 (52.9s - 64.2s) -> Sistemas Meteorológicos (Áudio: 53.15s - 63.85s)
+    # S6: 1926 - 2250 (64.2s - 75.0s) -> Encerramento Oficial (Áudio: 64.45s - 74.34s)
 
-    if frame_idx < 276:
+    if frame_idx < 321:
         render_scene_1(draw, frame_img, frame_idx)
-    elif frame_idx < 648:
-        render_scene_2(draw, frame_img, frame_idx - 276)
-    elif frame_idx < 1032:
-        render_scene_3(draw, frame_img, frame_idx - 648)
-    elif frame_idx < 1446:
-        render_scene_4(draw, frame_img, frame_idx - 1032)
-    elif frame_idx < 1710:
-        render_scene_5(draw, frame_img, frame_idx - 1446)
+    elif frame_idx < 669:
+        render_scene_2(draw, frame_img, frame_idx - 321)
+    elif frame_idx < 1143:
+        render_scene_3(draw, frame_img, frame_idx - 669)
+    elif frame_idx < 1587:
+        render_scene_4(draw, frame_img, frame_idx - 1143)
+    elif frame_idx < 1926:
+        render_scene_5(draw, frame_img, frame_idx - 1587)
     else:
-        render_scene_6(draw, frame_img, frame_idx - 1710)
+        render_scene_6(draw, frame_img, frame_idx - 1926)
 
     f_foot = get_font(False, 22)
     draw.text((WIDTH // 2, HEIGHT - 35), "Fontes: Estações Meteorológicas do Município", font=f_foot, fill=COLOR_MUTED, anchor="mm")
