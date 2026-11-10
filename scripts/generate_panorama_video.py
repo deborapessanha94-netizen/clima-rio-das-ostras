@@ -158,7 +158,7 @@ def render_frame(frame_idx):
     f_foot = get_font(False, 24)
     draw.text((WIDTH // 2, HEIGHT - 50), "Fontes: Estações Meteorológicas do Município", font=f_foot, fill=COLOR_MUTED, anchor="mm")
 
-    return cv2.cvtColor(np.array(frame_img), cv2.COLOR_RGBA2BGR)
+    return frame_img.convert("RGB").tobytes()
 
 # SCENE 1: ABERTURA COM IMPACTO E OS 3 NÚMEROS CHAVE (6s)
 def render_scene_1(draw, frame_img, rel_frame):
@@ -499,44 +499,51 @@ def render_scene_6(draw, frame_img, rel_frame):
 def main():
     out_dir = "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/videos"
     os.makedirs(out_dir, exist_ok=True)
-    temp_raw = os.path.join(out_dir, "temp_reels_silent_raw.mp4")
     out_path = os.path.join(out_dir, "panorama_outubro_2026_reels.mp4")
 
-    print(f"Generating clean, separated 6-scene Reels: {temp_raw}")
-    print(f"Total frames: {TOTAL_FRAMES} at {FPS} FPS ({TOTAL_SECONDS}s)")
-
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    writer = cv2.VideoWriter(temp_raw, fourcc, FPS, (WIDTH, HEIGHT))
-
-    if not writer.isOpened():
-        print("ERROR: Could not open VideoWriter!")
-        return
-
-    for f_idx in range(TOTAL_FRAMES):
-        frame = render_frame(f_idx)
-        writer.write(frame)
-        if f_idx % 120 == 0:
-            print(f"Rendered {f_idx}/{TOTAL_FRAMES} frames ({(f_idx/TOTAL_FRAMES)*100:.1f}%)")
-
-    writer.release()
-    print("Video stream rendered. Encoding silent Reels video with H.264 (-an)...")
+    print(f"Generating MAXIMUM QUALITY Master Reels: {out_path}")
+    print(f"Total frames: {TOTAL_FRAMES} at {FPS} FPS ({TOTAL_SECONDS}s) - Lossless Direct Pipe into libx264 CRF 15")
 
     ffmpeg = imageio_ffmpeg.get_ffmpeg_exe()
     cmd = [
         ffmpeg, "-y",
-        "-i", temp_raw,
-        "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p",
+        "-f", "rawvideo",
+        "-vcodec", "rawvideo",
+        "-s", f"{WIDTH}x{HEIGHT}",
+        "-pix_fmt", "rgb24",
+        "-r", str(FPS),
+        "-i", "-",
+        "-c:v", "libx264",
+        "-profile:v", "high",
+        "-level:v", "4.2",
+        "-preset", "slow",
+        "-crf", "15",
+        "-pix_fmt", "yuv420p",
+        "-colorspace", "bt709",
+        "-color_primaries", "bt709",
+        "-color_trc", "bt709",
+        "-color_range", "tv",
+        "-movflags", "+faststart",
         "-an",
         out_path
     ]
-    res = subprocess.run(cmd, capture_output=True, text=True)
-    if res.returncode == 0:
-        print("DONE! Final Master Reels video created:", out_path)
+
+    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    for f_idx in range(TOTAL_FRAMES):
+        raw_bytes = render_frame(f_idx)
+        proc.stdin.write(raw_bytes)
+        if f_idx % 120 == 0:
+            print(f"Rendered & Encoded {f_idx}/{TOTAL_FRAMES} frames ({(f_idx/TOTAL_FRAMES)*100:.1f}%)")
+
+    proc.stdin.close()
+    stdout, stderr = proc.communicate()
+
+    if proc.returncode == 0:
+        print("DONE! Master Maximum Quality Reels video created:", out_path)
         print("File size:", os.path.getsize(out_path), "bytes")
-        if os.path.exists(temp_raw):
-            os.remove(temp_raw)
     else:
-        print("FFmpeg error:", res.stderr)
+        print("FFmpeg error:", stderr.decode('utf-8', errors='ignore'))
 
 if __name__ == "__main__":
     main()
