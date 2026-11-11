@@ -18,7 +18,7 @@ Sistema web centralizado para visualização, análise e acompanhamento em tempo
 - **Jardim Mariléa**: Região residencial de alta densidade no eixo da Amaral Peixoto.
 - **Âncora - Lagoa de Iriry**: Monitoramento de drenagem e cheias pluviais na Zona Norte.
 - **Cantagalo - Vale Agrícola**: Microclima rural de vale interiorano.
-- **Rocha Leão - Serra**: Região continental serrana (altitude de 85m).
+- **Rocha Leão - Interior Rural**: Região interiorana/rural com remanescentes de Mata Atlântica (altitude de 85m).
 
 ---
 

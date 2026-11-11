@@ -109,7 +109,7 @@ def draw_header_bar(draw, frame_idx, current_scene_idx):
         else:
             draw_rounded_rect(draw, (sx0, step_y, sx1, step_y + step_h), fill=(40, 50, 75), radius=3)
 
-def render_frame(frame_idx):
+def get_frame_image(frame_idx):
     frame_img = base_bg.copy()
     draw = ImageDraw.Draw(frame_img)
     
@@ -158,7 +158,10 @@ def render_frame(frame_idx):
     f_foot = get_font(False, 24)
     draw.text((WIDTH // 2, HEIGHT - 50), "Fontes: Estações Meteorológicas do Município", font=f_foot, fill=COLOR_MUTED, anchor="mm")
 
-    return frame_img.convert("RGB").tobytes()
+    return frame_img.convert("RGB")
+
+def render_frame(frame_idx):
+    return get_frame_image(frame_idx).tobytes()
 
 # SCENE 1: ABERTURA COM IMPACTO E OS 3 NÚMEROS CHAVE (6s)
 def render_scene_1(draw, frame_img, rel_frame):
@@ -289,7 +292,7 @@ def render_scene_3(draw, frame_img, rel_frame):
     draw.text((WIDTH // 2, 215), "Ranking total de chuva acumulada em Outubro de 2026", font=get_font(False, 24), fill=COLOR_MUTED, anchor="mm")
 
     stations = [
-        {"name": "Rocha Leão (REBIO União)", "val": 410.0, "rank": "1º • RECORDE", "color": COLOR_ORANGE, "sub": "Relevo e reserva biológica retiveram nuvens pesadas"},
+        {"name": "Rocha Leão (REBIO União)", "val": 410.0, "rank": "1º • RECORDE", "color": COLOR_ORANGE, "sub": "Região rural e reserva biológica retiveram nuvens pesadas"},
         {"name": "Cantagalo (LERIP)", "val": 191.7, "rank": "2º LUGAR", "color": COLOR_BLUE, "sub": "Zona rural com fortes pancadas de primavera"},
         {"name": "Praiamar / Divisa Sul", "val": 177.3, "rank": "3º LUGAR", "color": COLOR_BLUE, "sub": "Corredor costeiro de entrada de umidade"},
         {"name": "Praia da Tartaruga (Defesa Civil)", "val": 167.9, "rank": "4º LUGAR", "color": COLOR_BLUE, "sub": "Estação costeira oficial do Centro"},
@@ -332,9 +335,9 @@ def render_scene_3(draw, frame_img, rel_frame):
     # Clean Takeaway
     call_y = start_y + len(stations) * row_h + 25
     draw_rounded_rect(draw, (60, call_y, WIDTH - 60, call_y + 140), fill=COLOR_NAVY, outline=COLOR_ORANGE, radius=24, width=2)
-    draw.text((WIDTH // 2, call_y + 40), "CURIOSIDADE DO RELEVO", font=get_font(True, 24), fill=COLOR_ORANGE, anchor="mm")
+    draw.text((WIDTH // 2, call_y + 40), "DESTAQUE DA REGIÃO RURAL", font=get_font(True, 24), fill=COLOR_ORANGE, anchor="mm")
     draw.text((WIDTH // 2, call_y + 85), "Rocha Leão (410 mm) acumulou mais que o triplo de Costazul (131 mm),", font=get_font(False, 22), fill=COLOR_WHITE, anchor="mm")
-    draw.text((WIDTH // 2, call_y + 115), "comprovando a forte retenção de umidade na serra municipal.", font=get_font(False, 20), fill=COLOR_MUTED, anchor="mm")
+    draw.text((WIDTH // 2, call_y + 115), "comprovando a forte retenção de umidade na região rural.", font=get_font(False, 20), fill=COLOR_MUTED, anchor="mm")
 
 # SCENE 4: VENTOS & TEMPERATURAS (8s)
 def render_scene_4(draw, frame_img, rel_frame):
@@ -496,7 +499,36 @@ def render_scene_6(draw, frame_img, rel_frame):
     draw.line([(c_x + 50, box_y + 510), (c_x + card_w - 50, box_y + 510)], fill=COLOR_BLUE, width=2)
     draw.text((WIDTH // 2, box_y + 545), "Siga @tempoemriodasostras no Instagram e compartilhe!", font=get_font(True, 28), fill=COLOR_ORANGE, anchor="mm")
 
+def export_carousel_slides():
+    slide_specs = [
+        (175, "01_panorama_destaques.png"),
+        (415, "02_volume_total_chuva.png"),
+        (685, "03_ranking_estacoes.png"),
+        (925, "04_ventos_e_temperaturas.png"),
+        (1165, "05_sistemas_meteorologicos.png"),
+        (1405, "06_acompanhe_diariamente.png")
+    ]
+    target_dirs = [
+        "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/carrossel",
+        "C:/Users/debor/.gemini/antigravity/brain/1a2d4b0a-d847-461b-a23b-26c56d91d2df/carrossel"
+    ]
+    for d in target_dirs:
+        os.makedirs(d, exist_ok=True)
+
+    print("--- Exporting 6 Lossless PNG Slides for Carrossel / Stories ---")
+    for f_idx, fname in slide_specs:
+        img = get_frame_image(f_idx)
+        for d in target_dirs:
+            dst = os.path.join(d, fname)
+            img.save(dst, format="PNG", optimize=True)
+            print(f"Saved: {dst}")
+    print("All 6 Carrossel slides successfully updated!")
+
 def main():
+    # 1. Export high-res PNG slides
+    export_carousel_slides()
+
+    # 2. Render master video
     out_dir = "C:/Users/debor/.gemini/antigravity/scratch/clima-rio-das-ostras/public/videos"
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, "panorama_outubro_2026_reels.mp4")
