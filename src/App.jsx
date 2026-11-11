@@ -247,7 +247,7 @@ export function App() {
             </button>
           </div>
 
-          {/* Vídeo Panorama Mensal (Outubro/2026) */}
+          {/* Panorama Mensal (Outubro/2026) - Vídeos e Carrossel */}
           <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-purple-950 border border-indigo-800/40 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-white">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 text-white flex items-center justify-center font-bold shadow-md shrink-0">
@@ -256,14 +256,14 @@ export function App() {
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-bold text-sm sm:text-base text-white">
-                    Vídeo Panorama • Outubro/2026
+                    Panorama Mensal • Outubro/2026
                   </h3>
                   <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-950 text-indigo-300 border border-indigo-800">
-                    FullHD Reels & 16:9
+                    Reels, Feed & Stories
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 line-clamp-1 sm:line-clamp-none">
-                  Retrospectiva animada das estações, chuva e vento para @tempoemriodasostras.
+                  Vídeo oficial e 6 lâminas em alta definição prontas para baixar e postar no Instagram.
                 </p>
               </div>
             </div>
@@ -273,7 +273,7 @@ export function App() {
               className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white text-xs font-bold shadow-md transition active:scale-95 cursor-pointer flex items-center justify-center gap-1.5 shrink-0"
             >
               <Film className="w-3.5 h-3.5" />
-              <span>Ver & Baixar Vídeo</span>
+              <span>Ver Vídeo & Imagens</span>
             </button>
           </div>
         </div>

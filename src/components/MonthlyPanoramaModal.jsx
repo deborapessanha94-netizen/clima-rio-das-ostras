@@ -14,39 +14,67 @@ import {
   Sparkles,
   Play,
   Maximize2,
-  Share2
+  Share2,
+  ChevronLeft,
+  ChevronRight,
+  Image as ImageIcon,
+  Layers
 } from 'lucide-react';
 
 export function MonthlyPanoramaModal({ isOpen, onClose }) {
-  const [activeFormat, setActiveFormat] = useState('reels'); // 'reels' | 'horizontal'
+  // 'reels' | 'horizontal' | 'feed_slides' | 'stories_slides'
+  const [activeFormat, setActiveFormat] = useState('reels');
+  const [currentSlideIdx, setCurrentSlideIdx] = useState(0);
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
 
-  const verticalVideoSrc = '/videos/panorama_outubro_2026_reels.mp4';
-  const horizontalVideoSrc = '/videos/panorama_outubro_2026_horizontal.mp4';
+  const verticalVideoSrc = '/videos/panorama_outubro_2026_reels.mp4?v=20261110_rural';
+  const horizontalVideoSrc = '/videos/panorama_outubro_2026_horizontal.mp4?v=20261110';
 
-  const currentSrc = activeFormat === 'reels' ? verticalVideoSrc : horizontalVideoSrc;
+  const slides = [
+    { id: '01_panorama_destaques.png', label: '1. Abertura & 3 Grandes Números' },
+    { id: '02_volume_total_chuva.png', label: '2. Volume Total de Chuva' },
+    { id: '03_ranking_estacoes.png', label: '3. Ranking das Estações (Região Rural)' },
+    { id: '04_ventos_e_temperaturas.png', label: '4. Ventos & Temperaturas' },
+    { id: '05_sistemas_meteorologicos.png', label: '5. O Que Comandou o Tempo' },
+    { id: '06_acompanhe_diariamente.png', label: '6. Divulgação Oficial & Siga o Canal' },
+  ];
+
+  const isVideo = activeFormat === 'reels' || activeFormat === 'horizontal';
+  const currentVideoSrc = activeFormat === 'reels' ? verticalVideoSrc : horizontalVideoSrc;
+  
+  const currentImageSrc = activeFormat === 'feed_slides' 
+    ? `/carrossel/feed/${slides[currentSlideIdx].id}?v=20261110_rural`
+    : `/carrossel/stories/${slides[currentSlideIdx].id}?v=20261110_rural`;
+
+  const currentDownloadHref = isVideo 
+    ? currentVideoSrc 
+    : currentImageSrc;
+
+  const currentDownloadName = isVideo 
+    ? (activeFormat === 'reels' ? 'panorama_outubro_2026_reels.mp4' : 'panorama_outubro_2026_horizontal.mp4')
+    : (activeFormat === 'feed_slides' ? `feed_${slides[currentSlideIdx].id}` : `stories_${slides[currentSlideIdx].id}`);
 
   const socialCaption = `📊 RETROSPECTIVA CLIMÁTICA • OUTUBRO/2026 EM RIO DAS OSTRAS 🌧️🌊
 
 Confira como o clima se comportou em nosso município ao longo dos 31 dias de Outubro/2026, com dados consolidados de toda a rede oficial e particular de monitoramento!
 
 🚨 DESTAQUES DO MÊS:
-🌧️ Chuva Média da Rede: 243,3 mm (Mês extremamente úmido)
-🌧️ Ponto Mais Chuvoso: Rocha Leão com incríveis 410,0 mm!
-📅 Dias com Chuva Registrada: 25 de 31 dias (80% dos dias com precipitação)
-⛈️ Dia Mais Chuvoso: 02/10/2026 (Média municipal de 48,0 mm e pico de 84,3 mm)
+🌧️ Volume Total de Chuva: Variou de 131,3 mm (orla) a 410,0 mm (região rural)
+🏆 Recorde Municipal: Rocha Leão acumulou 410,0 mm (comprovando a forte retenção de chuva na região rural)!
+📅 Frequência das Chuvas: Choveu em 25 dos 31 dias (80% do mês com chuva)
+⛈️ Dia Mais Chuvoso: 02/10/2026 com volume de até 84,3 mm em apenas 24h
 💨 Maior Rajada do Mês: 62,3 km/h na Praia da Tartaruga (26/10 às 10:00)
 🌬️ Vento Médio: 16,6 km/h • Direção Predominante: Nordeste (NE)
-🌡️ Temperaturas: Mínima de 18,4°C | Máxima de 32,6°C
+🌡️ Temperaturas: Mínima de 18,4°C | Máxima de 32,6°C (Amplitude de 14,2°C)
 
-📍 RANKING DOS ACUMULADOS POR BAIRRO/ESTAÇÃO:
-1️⃣ Rocha Leão: 410,0 mm
-2️⃣ Cantagalo: 191,7 mm
-3️⃣ Praiamar: 177,3 mm
-4️⃣ Praia da Tartaruga: 167,9 mm
-5️⃣ Costazul: 131,3 mm
+📍 RANKING DOS ACUMULADOS TOTAIS POR BAIRRO/ESTAÇÃO:
+1️⃣ Rocha Leão (Região Rural): 410,0 mm
+2️⃣ Cantagalo (Zona Rural): 191,7 mm
+3️⃣ Praiamar (Divisa Sul): 177,3 mm
+4️⃣ Praia da Tartaruga (Centro / Defesa Civil): 167,9 mm
+5️⃣ Costazul (Orla Marítima): 131,3 mm
 
 🌀 SISTEMAS METEOROLÓGICOS ATUANTES:
 • ASAS (Alta Subtropical do Atlântico Sul): 12 dias
@@ -55,10 +83,10 @@ Confira como o clima se comportou em nosso município ao longo dos 31 dias de Ou
 • Frentes Frias Atuantes: 4 dias
 • Circulação Marítima Pós-Frontal: 3 dias
 
-Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar o clima em Rio das Ostras!
+Assista ao vídeo e veja o carrossel em alta definição! Compartilhe com quem precisa acompanhar o clima em Rio das Ostras!
 
 📍 Fontes: Estações Meteorológicas do Município
-👉 Siga @tempoemriodasostras para alertas, radares e monitoramento em tempo real.
+👉 Siga @tempoemriodasostras para alertas, previsões e monitoramento em tempo real.
 
 #RioDasOstras #ClimaRioDasOstras #TempoEmRioDasOstras #Chuva #Meteorologia #Outubro2026 #DefesaCivil #RegiaoDosLagos #PrevisaoDoTempo`;
 
@@ -66,6 +94,14 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
     navigator.clipboard.writeText(socialCaption);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handlePrevSlide = () => {
+    setCurrentSlideIdx((prev) => (prev > 0 ? prev - 1 : slides.length - 1));
+  };
+
+  const handleNextSlide = () => {
+    setCurrentSlideIdx((prev) => (prev < slides.length - 1 ? prev + 1 : 0));
   };
 
   return (
@@ -87,11 +123,11 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
                   Panorama Mensal • Outubro/2026
                 </h2>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
-                  Vídeo Oficial
+                  Oficial
                 </span>
               </div>
               <p className="text-xs text-sky-200/80">
-                Retrospectiva animada dos dados meteorológicos de Rio das Ostras
+                Vídeos e lâminas gráficas prontas para publicação no Instagram (Feed & Stories)
               </p>
             </div>
           </div>
@@ -108,64 +144,161 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
         <div className="overflow-y-auto p-4 sm:p-6 space-y-6">
           {/* Format Selector & Actions Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-600 dark:text-slate-300">Formato:</span>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 mr-1">Mídia:</span>
+              
               <button
                 onClick={() => setActiveFormat('reels')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                   activeFormat === 'reels'
                     ? 'bg-sky-600 text-white shadow-xs'
                     : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                 }`}
               >
-                <span>📱 Vertical (9:16) Reels/Stories</span>
+                <span>📱 Vídeo Reels (9:16)</span>
               </button>
+
+              <button
+                onClick={() => setActiveFormat('feed_slides')}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                  activeFormat === 'feed_slides'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>📸 Post Feed (4:5)</span>
+              </button>
+
+              <button
+                onClick={() => setActiveFormat('stories_slides')}
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                  activeFormat === 'stories_slides'
+                    ? 'bg-sky-600 text-white shadow-xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>📱 Stories (9:16)</span>
+              </button>
+
               <button
                 onClick={() => setActiveFormat('horizontal')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
                   activeFormat === 'horizontal'
                     ? 'bg-sky-600 text-white shadow-xs'
                     : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
                 }`}
               >
-                <span>💻 Horizontal (16:9) Feed/TV</span>
+                <span>💻 Vídeo 16:9</span>
               </button>
             </div>
 
             <div className="flex items-center gap-2">
               <a
-                href={currentSrc}
-                download={activeFormat === 'reels' ? 'panorama_outubro_2026_reels.mp4' : 'panorama_outubro_2026_horizontal.mp4'}
+                href={currentDownloadHref}
+                download={currentDownloadName}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition shadow-xs cursor-pointer"
-                title="Baixar vídeo em alta definição MP4"
+                title="Baixar arquivo em máxima qualidade"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Baixar MP4 ({activeFormat === 'reels' ? 'Vertical' : 'Horizontal'})</span>
+                <span>
+                  {isVideo 
+                    ? `Baixar MP4 (${activeFormat === 'reels' ? 'Reels' : '16:9'})` 
+                    : `Baixar Lâmina ${currentSlideIdx + 1} (PNG)`}
+                </span>
               </a>
             </div>
           </div>
 
-          {/* Video Player Display */}
+          {/* Media Display Area (Video or Interactive Slide Gallery) */}
           <div className="flex flex-col items-center justify-center bg-slate-950 rounded-2xl p-4 sm:p-6 shadow-inner border border-slate-800">
-            <div className={`relative overflow-hidden rounded-xl bg-black shadow-2xl ${
-              activeFormat === 'reels' 
-                ? 'w-full max-w-[340px] aspect-[9/16]' 
-                : 'w-full max-w-[760px] aspect-[16/9]'
-            }`}>
-              <video
-                key={currentSrc}
-                src={currentSrc}
-                controls
-                autoPlay
-                loop
-                playsInline
-                className="w-full h-full object-contain"
-              >
-                Seu navegador não suporta a reprodução de vídeo MP4.
-              </video>
-            </div>
+            {isVideo ? (
+              <div className={`relative overflow-hidden rounded-xl bg-black shadow-2xl ${
+                activeFormat === 'reels' 
+                  ? 'w-full max-w-[340px] aspect-[9/16]' 
+                  : 'w-full max-w-[760px] aspect-[16/9]'
+              }`}>
+                <video
+                  key={currentVideoSrc}
+                  src={currentVideoSrc}
+                  controls
+                  autoPlay
+                  loop
+                  playsInline
+                  className="w-full h-full object-contain"
+                >
+                  Seu navegador não suporta a reprodução de vídeo MP4.
+                </video>
+              </div>
+            ) : (
+              <div className="w-full flex flex-col items-center">
+                {/* Slide Title Bar */}
+                <div className="w-full max-w-[420px] flex items-center justify-between text-xs text-slate-300 mb-2 px-1">
+                  <span className="font-semibold text-sky-400">
+                    Lâmina {currentSlideIdx + 1} de {slides.length}
+                  </span>
+                  <span className="text-slate-400 truncate max-w-[220px]">
+                    {slides[currentSlideIdx].label}
+                  </span>
+                </div>
+
+                {/* Slide Preview with Navigation Chevrons */}
+                <div className={`relative overflow-hidden rounded-xl bg-slate-900 shadow-2xl border border-slate-800 group ${
+                  activeFormat === 'feed_slides' 
+                    ? 'w-full max-w-[380px] aspect-[4/5]' 
+                    : 'w-full max-w-[340px] aspect-[9/16]'
+                }`}>
+                  <img
+                    key={currentImageSrc}
+                    src={currentImageSrc}
+                    alt={slides[currentSlideIdx].label}
+                    className="w-full h-full object-contain"
+                  />
+
+                  {/* Previous button */}
+                  <button
+                    onClick={handlePrevSlide}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-950/70 hover:bg-slate-900 text-white flex items-center justify-center backdrop-blur-xs border border-white/20 transition cursor-pointer shadow-lg"
+                    title="Lâmina anterior"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+
+                  {/* Next button */}
+                  <button
+                    onClick={handleNextSlide}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-950/70 hover:bg-slate-900 text-white flex items-center justify-center backdrop-blur-xs border border-white/20 transition cursor-pointer shadow-lg"
+                    title="Próxima lâmina"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Dots indicator */}
+                <div className="flex items-center gap-2 mt-3">
+                  {slides.map((s, idx) => (
+                    <button
+                      key={s.id}
+                      onClick={() => setCurrentSlideIdx(idx)}
+                      className={`h-2 rounded-full transition-all cursor-pointer ${
+                        currentSlideIdx === idx 
+                          ? 'w-6 bg-sky-500' 
+                          : 'w-2 bg-slate-700 hover:bg-slate-600'
+                      }`}
+                      title={s.label}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             <p className="mt-3 text-center text-xs text-slate-400">
-              💡 Dica: O vídeo já está formatado com taxa de 30 FPS e resolução FullHD 1080p pronto para publicação direta.
+              {isVideo 
+                ? '💡 Dica: O vídeo já está formatado com taxa de 30 FPS, sem áudio embutido, pronto para adicionar áudios em alta no Reels.'
+                : activeFormat === 'feed_slides'
+                  ? '💡 Proporção 4:5 (1080x1350): Padrão perfeito para Carrossel no Feed do Instagram sem cortes laterais ou verticais.'
+                  : '💡 Proporção 9:16 (1080x1920): Padrão vertical completo para Stories sequenciais no Instagram.'}
             </p>
           </div>
 
@@ -179,13 +312,13 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
               <div className="p-3.5 rounded-xl bg-sky-50 dark:bg-sky-950/40 border border-sky-200/60 dark:border-sky-800/40">
                 <div className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400 text-xs font-medium mb-1">
                   <CloudRain className="w-4 h-4" />
-                  <span>Média da Rede</span>
+                  <span>Volume Total</span>
                 </div>
                 <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
-                  243,3 <span className="text-xs font-semibold text-slate-500">mm</span>
+                  131 a 410 <span className="text-xs font-semibold text-slate-500">mm</span>
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  168% acima da normal
+                  Em todo o município
                 </p>
               </div>
 
@@ -198,7 +331,7 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
                   410,0 <span className="text-xs font-semibold text-slate-500">mm</span>
                 </div>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  Maior acumulado do ano
+                  Região Rural • Recorde anual
                 </p>
               </div>
 
@@ -230,38 +363,34 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
             </div>
           </div>
 
-          {/* Ranking & Rio Jundia Breakdown */}
+          {/* Ranking & Synoptic Systems Breakdown */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Stations Rain List */}
             <div className="p-4 rounded-xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700">
               <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
                 <CloudRain className="w-4 h-4 text-sky-500" />
-                Acumulado por Estação no Mês
+                Acumulado Total por Estação no Mês
               </h4>
               <div className="space-y-2">
                 <div className="flex items-center justify-between p-2 rounded-lg bg-sky-50/70 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800/40">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">🥇 Rocha Leão</span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">🥇 Rocha Leão (Região Rural)</span>
                   <span className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400">410,0 mm</span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">🥈 Cantagalo</span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">🥈 Cantagalo (Zona Rural)</span>
                   <span className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400">191,7 mm</span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">🥉 Praiamar</span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">🥉 Praiamar (Divisa Sul)</span>
                   <span className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400">177,3 mm</span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">4️⃣ Praia da Tartaruga</span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">4️⃣ Praia da Tartaruga (Centro)</span>
                   <span className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400">167,9 mm</span>
                 </div>
                 <div className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60">
-                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">5️⃣ Costazul</span>
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">5️⃣ Costazul (Orla)</span>
                   <span className="text-xs font-bold font-mono text-sky-600 dark:text-sky-400">131,3 mm</span>
-                </div>
-                <div className="flex items-center justify-between p-2 rounded-lg bg-sky-50/50 dark:bg-sky-950/20 border border-sky-100 dark:border-sky-800/30">
-                  <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">📊 Média Geral da Rede</span>
-                  <span className="text-xs font-bold font-mono text-sky-700 dark:text-sky-300">243,3 mm</span>
                 </div>
               </div>
             </div>
@@ -276,7 +405,7 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
                 <div className="space-y-2 text-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-600 dark:text-slate-400">Alta Subtropical (ASAS)</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">12 dias</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">12 dias (38,7%)</span>
                   </div>
                   <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-amber-500 h-full rounded-full" style={{ width: '38.7%' }} />
@@ -284,7 +413,7 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
 
                   <div className="flex items-center justify-between pt-1">
                     <span className="text-slate-600 dark:text-slate-400">Cavado / Instab. Local</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">8 dias</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">8 dias (25,8%)</span>
                   </div>
                   <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-sky-500 h-full rounded-full" style={{ width: '25.8%' }} />
@@ -292,7 +421,7 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
 
                   <div className="flex items-center justify-between pt-1">
                     <span className="text-slate-600 dark:text-slate-400">Cavado / Convergência</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">4 dias</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">4 dias (12,9%)</span>
                   </div>
                   <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-indigo-500 h-full rounded-full" style={{ width: '12.9%' }} />
@@ -300,7 +429,7 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
 
                   <div className="flex items-center justify-between pt-1">
                     <span className="text-slate-600 dark:text-slate-400">Frentes Frias Atuantes</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">4 dias</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">4 dias (12,9%)</span>
                   </div>
                   <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-blue-600 h-full rounded-full" style={{ width: '12.9%' }} />
@@ -308,7 +437,7 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
 
                   <div className="flex items-center justify-between pt-1">
                     <span className="text-slate-600 dark:text-slate-400">Circulação Pós-Frontal</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">3 dias</span>
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">3 dias (9,7%)</span>
                   </div>
                   <div className="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-teal-500 h-full rounded-full" style={{ width: '9.7%' }} />
@@ -328,14 +457,14 @@ Assista ao vídeo em alta definição e compartilhe com quem precisa acompanhar 
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <Share2 className="w-4 h-4 text-sky-500" />
-                Texto Pronto para Postagem (Instagram / WhatsApp)
+                Legenda Pronta para Postagem (Instagram / WhatsApp)
               </span>
               <button
                 onClick={handleCopyCaption}
                 className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold text-sky-700 dark:text-sky-300 bg-sky-100 dark:bg-sky-950/60 hover:bg-sky-200 dark:hover:bg-sky-900 transition cursor-pointer"
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copied ? 'Copiado!' : 'Copiar Texto'}</span>
+                <span>{copied ? 'Copiado!' : 'Copiar Legenda'}</span>
               </button>
             </div>
             <textarea

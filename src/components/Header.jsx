@@ -87,11 +87,11 @@ export function Header({
             <button
               onClick={onOpenPanoramaModal}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 transition shadow-xs cursor-pointer active:scale-95"
-              title="Assistir e baixar o Vídeo Retrospectiva do Mês de Outubro/2026"
+              title="Assistir ao vídeo e baixar lâminas do mês de Outubro/2026"
             >
               <Film className="w-3.5 h-3.5 text-pink-200" />
-              <span className="hidden xs:inline">Vídeo Outubro</span>
-              <span className="xs:hidden">Vídeo</span>
+              <span className="hidden xs:inline">Panorama Mês</span>
+              <span className="xs:hidden">Mês</span>
             </button>
           )}
 
